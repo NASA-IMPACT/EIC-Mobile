@@ -181,7 +181,6 @@ export default function Panel({ selectedIndex }) {
         <div style={{ width: 'calc(100% - 32px)', height: '200px', position: 'relative' }}>
             <canvas ref={chartRef} style={{ width: '100%' }}></canvas>
 
-
             {loading && (
                 <div className="absolute inset-0 flex items-center justify-center">
                     <div className="w-full h-1/4 bg-neutral-950 bg-opacity-90 rounded-md animate-pulse"></div>
