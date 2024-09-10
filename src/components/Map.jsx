@@ -187,8 +187,8 @@ export default function Home() {
 
     view.when(async () => {
       const initialCenterPoint = new Point({
-        longitude: -77.0369,
-        latitude: 38.9072,
+        longitude: -51.9253,
+        latitude: -14.2350,
         spatialReference: { wkid: 4326 }
       });
 
