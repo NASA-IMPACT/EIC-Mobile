@@ -2,13 +2,16 @@ import { useContext, useEffect, useRef, useState } from 'react';
 import Chart from 'chart.js/auto';
 import crosshairPlugin from 'chartjs-plugin-crosshair';
 import { ChartDataContext, CurrentJSONContext } from '../contexts/AppContext';
+import { VideoContext } from '../contexts/VideoContext';
 
 export default function Panel({ selectedIndex }) {
     const { chartData } = useContext(ChartDataContext);
     const { currentJSON } = useContext(CurrentJSONContext);
+    const { currentFrame, isPlaying, setIsPlaying, videoRefs } = useContext(VideoContext);
     const chartRef = useRef(null);
     const chartInstanceRef = useRef(null);
     const [loading, setLoading] = useState(true);
+    const [wasPlaying, setWasPlaying] = useState(false);
 
     useEffect(() => {
         if (chartRef.current && chartData.length > 0) {
@@ -108,7 +111,31 @@ export default function Panel({ selectedIndex }) {
                             },
                         },
                     },
-                    plugins: [crosshairPlugin],
+                    plugins:
+                        [
+                            crosshairPlugin,
+                            {
+                                id: 'verticalLinePlugin',
+                                afterDraw: (chart) => {
+                                    if (chart.tooltip?._active?.length) {
+                                        const activePoint = chart.tooltip._active[0];
+                                        const ctx = chart.ctx;
+                                        const x = activePoint.element.x;
+                                        const topY = chart.scales.y.top;
+                                        const bottomY = chart.scales.y.bottom;
+
+                                        ctx.save();
+                                        ctx.beginPath();
+                                        ctx.moveTo(x, topY);
+                                        ctx.lineTo(x, bottomY);
+                                        ctx.lineWidth = 0.5;
+                                        ctx.strokeStyle = '#FF0000';
+                                        ctx.stroke();
+                                        ctx.restore();
+                                    }
+                                }
+                            }
+                        ],
                 });
 
                 setLoading(false);
@@ -123,9 +150,37 @@ export default function Panel({ selectedIndex }) {
         };
     }, [chartData, selectedIndex, currentJSON]);
 
+
+    useEffect(() => {
+        if (chartData.length > 0) {
+          const updateChartLineManually = () => {
+            if (chartInstanceRef.current) {
+              const fps = 1;
+              const totalDataPoints = chartData.length;
+              const totalFrames = 150;
+              const frameOffset = 1;
+
+              const boundedFrame = (currentFrame + frameOffset) % totalFrames;
+              const currentIndex = Math.floor(boundedFrame * fps);
+              const boundedIndex = Math.max(Math.min(currentIndex, totalDataPoints), 0);
+
+              chartInstanceRef.current.tooltip.setActiveElements([{ datasetIndex: selectedIndex, index: boundedIndex }], {
+                x: chartInstanceRef.current.getDatasetMeta(selectedIndex).data[boundedIndex]?.x || 0,
+                y: chartInstanceRef.current.getDatasetMeta(selectedIndex).data[boundedIndex]?.y || 0
+              });
+
+              chartInstanceRef.current.update();
+            }
+          };
+
+          updateChartLineManually();
+        }
+      }, [chartData, currentFrame, selectedIndex]);
+
     return (
         <div style={{ width: 'calc(100% - 32px)', height: '200px', position: 'relative' }}>
             <canvas ref={chartRef} style={{ width: '100%' }}></canvas>
+
             {loading && (
                 <div className="absolute inset-0 flex items-center justify-center">
                     <div className="w-full h-1/4 bg-neutral-950 bg-opacity-90 rounded-md animate-pulse"></div>

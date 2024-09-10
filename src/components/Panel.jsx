@@ -24,7 +24,7 @@ const StyledTabList = styled(TabList)`
 `;
 
 export default function Panel() {
-    const { isPlaying, playVideo, pauseVideo } = useContext(VideoContext);
+    const { isPlaying, setIsPlaying, currentFrame, setCurrentFrame, videoRefs } = useContext(VideoContext);
     const { mapView } = useContext(MapViewContext);
     const { setDataSelection } = useContext(DataSelectionContext);
     const { setCurrentJSON } = useContext(CurrentJSONContext);
@@ -35,10 +35,33 @@ export default function Panel() {
 
     const handlePlayPause = () => {
         if (isPlaying) {
-          pauseVideo();
+            videoRefs.current[selectedIndex].pause();
+            setCurrentFrame(videoRefs.current[selectedIndex].currentTime);
         } else {
-          playVideo();
+            videoRefs.current[selectedIndex].currentTime = currentFrame;
+            videoRefs.current[selectedIndex].play();
         }
+        setIsPlaying(!isPlaying);
+    };
+
+    const handleForward = () => {
+        const video = videoRefs.current[selectedIndex];
+        const totalDuration = video.duration;
+        const stepSize = totalDuration / 150;
+
+        const newFrame = Math.min(currentFrame + stepSize, totalDuration);
+        setCurrentFrame(newFrame);
+        video.currentTime = newFrame;
+    };
+
+    const handleBackward = () => {
+        const video = videoRefs.current[selectedIndex];
+        const totalDuration = video.duration;
+        const stepSize = totalDuration / 150;
+
+        const newFrame = Math.max(currentFrame - stepSize, 0);
+        setCurrentFrame(newFrame);
+        video.currentTime = newFrame;
     };
 
     const changeLayer = (item, index) => {
@@ -111,7 +134,7 @@ export default function Panel() {
                                 <h2 className="text-white text-2xl">Heat Index</h2>
 
                                 <div className="absolute left-1/2 transform -translate-x-1/2 flex gap-4">
-                                    <div className="bg-transparent text-white text-xl cursor-pointer">
+                                    <div className="bg-transparent text-white text-xl cursor-pointer" onClick={handleBackward}>
                                         <BackwardIcon className="h-6 w-6 text-white" />
                                     </div>
 
@@ -123,7 +146,7 @@ export default function Panel() {
                                         )}
                                     </div>
 
-                                    <div className="bg-transparent text-white text-xl cursor-pointer">
+                                    <div className="bg-transparent text-white text-xl cursor-pointer" onClick={handleForward} >
                                         <ForwardIcon className="h-6 w-6 text-white" />
                                     </div>
                                 </div>

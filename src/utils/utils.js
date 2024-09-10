@@ -13,9 +13,25 @@ export const handleImageServiceRequest = async (event, currentJSON, setChartData
   const endDate = currentJSON.datetimeRange?.[1] || Date.UTC(2100, 0, 31);
   url.searchParams.append("time", `${new Date(startDate).toISOString()},${new Date(endDate).toISOString()}`);
 
+  const mockData = {
+    samples: Array.from({ length: 150 }, (_, i) => {
+      const year = 1950 + i;
+      const baseTemp = 70 + i * 0.1;
+      return {
+        attributes: {
+          StdTime: Date.UTC(year, 0, 1),
+          heatmax_ssp126: (baseTemp + Math.random() * 5).toFixed(2),
+          heatmax_ssp245: (baseTemp + Math.random() * 7 + 2).toFixed(2),
+          heatmax_ssp370: (baseTemp + Math.random() * 10 + 5).toFixed(2),
+        },
+      };
+    }),
+  };
+
   try {
     const response = await fetch(url.toString(), { method: 'GET' });
     const results = await response.json();
+    // const results = mockData;
 
     if (results.samples && results.samples.length > 0) {
       const yearlyData = {};

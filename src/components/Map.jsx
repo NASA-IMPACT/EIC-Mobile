@@ -1,4 +1,3 @@
-
 import Point from '@arcgis/core/geometry/Point';
 import { useContext, useEffect, useRef } from 'react';
 import Graphic from '@arcgis/core/Graphic';
@@ -19,14 +18,13 @@ import * as geometryEngineAsync from '@arcgis/core/geometry/geometryEngineAsync'
 import { handleImageServiceRequest } from '../utils/utils';
 
 export default function Home() {
-  const { videoElementRef } = useContext(VideoContext);
-  const mapDiv = useRef(null);
-  const { mapView } = useContext(MapViewContext);
+  const { videoRefs, currentFrame, setCurrentFrame, isPlaying } = useContext(VideoContext);
+  const { mapView, setMapView } = useContext(MapViewContext);
   const { currentJSON } = useContext(CurrentJSONContext);
   const { setChartData } = useContext(ChartDataContext);
-  const { setMapView } = useContext(MapViewContext);
-  const { setVitalsData} = useContext(VitalsDataContext);
+  const { setVitalsData } = useContext(VitalsDataContext);
 
+  const mapDiv = useRef(null);
   const currentJSONRef = useRef(currentJSON);
 
   useEffect(() => {
@@ -34,8 +32,11 @@ export default function Home() {
   }, [currentJSON]);
 
   useEffect(() => {
+    if (mapView) return;
+
     let layerList = [];
-    config.forEach(layer => {
+
+    config.forEach((layer, index) => {
       const element = new VideoElement({
         video: layer.video,
         georeference: new ExtentAndRotationGeoreference({
@@ -51,8 +52,6 @@ export default function Home() {
         })
       });
 
-      videoElementRef.current = element;
-
       const mediaLayer = new MediaLayer({
         source: [element],
         title: layer.name,
@@ -60,6 +59,13 @@ export default function Home() {
       });
 
       layerList.push(mediaLayer);
+
+      element.when(() => {
+        const videoElement = element.content;
+        videoRefs.current[index] = videoElement;
+
+        videoElement.currentTime = currentFrame;
+      });
     });
 
     const map = new Map({
@@ -89,6 +95,7 @@ export default function Home() {
 
     let draggingInsideBuffer = false;
     let initialCamera;
+    let lastKnownPoint;
 
     const bufferSymbol = {
       type: "simple-fill",
@@ -118,7 +125,6 @@ export default function Home() {
       return { bufferLayer, pointLayer };
     };
 
-
     const { bufferLayer, pointLayer } = initializeLayers();
 
     const createBuffer = async (point) => {
@@ -128,8 +134,8 @@ export default function Home() {
       const buffer = await geometryEngineAsync.geodesicBuffer(point, 560, 'kilometers');
 
       if (pointLayer.graphics.length === 0) {
-        pointLayer.add(new Graphic({ geometry: point, symbol: pointSymbol, attributes: { name: 'Geodesic-Buffer' }   }));
-        bufferLayer.add(new Graphic({ geometry: buffer, symbol: bufferSymbol, attributes: { name: 'Geodesic-Buffer' }   }));
+        pointLayer.add(new Graphic({ geometry: point, symbol: pointSymbol, attributes: { name: 'Geodesic-Buffer' } }));
+        bufferLayer.add(new Graphic({ geometry: buffer, symbol: bufferSymbol, attributes: { name: 'Geodesic-Buffer' } }));
       } else {
         const pointGraphic = pointLayer.graphics.getItemAt(0);
         pointGraphic.geometry = point;
@@ -139,8 +145,6 @@ export default function Home() {
         bufferGraphic.attributes = { name: 'Geodesic-Buffer' };
       }
     };
-
-    let lastKnownPoint;
 
     const handleDragStart = async (event) => {
       const startPoint = view.toMap({ x: event.x, y: event.y });
@@ -163,9 +167,7 @@ export default function Home() {
 
         if (updatedPoint) {
           event.stopPropagation();
-
           await createBuffer(updatedPoint);
-
           lastKnownPoint = updatedPoint;
         }
       }
@@ -184,10 +186,6 @@ export default function Home() {
     };
 
     view.when(async () => {
-
-      // Adding a default point for Washington, DC. We'll try
-      // to make this more dynamic and to depend on the user location,
-      // but for now it's hardcoded.
       const initialCenterPoint = new Point({
         longitude: -77.0369,
         latitude: 38.9072,
@@ -200,7 +198,6 @@ export default function Home() {
       });
 
       await createBuffer(initialCenterPoint);
-
       await handleMapClick({ mapPoint: initialCenterPoint });
 
       view.on("drag", (event) => {
@@ -214,20 +211,12 @@ export default function Home() {
       });
     });
 
-    const searchWidget = new Search({
-      view: view
-    });
-
-    view.when(() => {
-      view.ui.move("zoom", "top-right");
-      view.ui.move("compass", "top-right");
-      view.ui.move("navigation-toggle", "top-right");
-      view.ui.move("attribution", "bottom-right");
-    });
-
-    view.ui.add(searchWidget, {
-      position: 'top-right'
-    });
+    const searchWidget = new Search({ view });
+    view.ui.add(searchWidget, { position: 'top-right' });
+    view.ui.move("zoom", "top-right");
+    view.ui.move("compass", "top-right");
+    view.ui.move("navigation-toggle", "top-right");
+    view.ui.move("attribution", "bottom-right");
 
     setMapView(view);
 
@@ -235,14 +224,50 @@ export default function Home() {
       if (view) {
         view.destroy();
       }
-    }
-  }, [setMapView]);
+    };
+  }, [setMapView, videoRefs]);
 
   const handleMapClick = async (event) => {
     if (!currentJSON.wcs) {
       await handleImageServiceRequest(event, currentJSONRef.current, setChartData, setVitalsData);
     }
   };
+
+  useEffect(() => {
+    const totalFrames = 150;
+
+    let intervalId;
+
+    const playVideoManually = () => {
+      videoRefs.current.forEach((videoElement, index) => {
+        if (videoElement) {
+          const fps = 1;
+          const frameDuration = 1 / fps;
+
+          if (isPlaying) {
+            setCurrentFrame((prevFrame) => {
+              const newFrame = prevFrame + frameDuration;
+              if (newFrame >= totalFrames) {
+                videoElement.currentTime = 0;
+                setCurrentFrame(0);
+              } else {
+                videoElement.currentTime = newFrame;
+              }
+              return newFrame;
+            });
+          }
+        }
+      });
+    };
+
+    if (isPlaying) {
+      intervalId = setInterval(playVideoManually, 1000);
+    }
+
+    return () => {
+      if (intervalId) clearInterval(intervalId);
+    };
+  }, [isPlaying, videoRefs, setCurrentFrame]);
 
   return (
     <div>
