@@ -29,9 +29,9 @@ export const handleImageServiceRequest = async (event, currentJSON, setChartData
   };
 
   try {
-    const response = await fetch(url.toString(), { method: 'GET' });
-    const results = await response.json();
-    // const results = mockData;
+    // const response = await fetch(url.toString(), { method: 'GET' });
+    // const results = await response.json();
+    const results = mockData;
 
     if (results.samples && results.samples.length > 0) {
       const yearlyData = {};

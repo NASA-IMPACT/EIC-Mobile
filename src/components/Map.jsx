@@ -235,39 +235,49 @@ export default function Home() {
 
   useEffect(() => {
     const totalFrames = 150;
+    const fps = 1;
+    const frameDuration = 1000 / fps;
+    let lastFrameTime = 0;
+    let animationFrameId;
 
-    let intervalId;
+    const playVideoManually = (timestamp) => {
+      if (!lastFrameTime) {
+        lastFrameTime = timestamp;
+      }
 
-    const playVideoManually = () => {
-      videoRefs.current.forEach((videoElement, index) => {
-        if (videoElement) {
-          const fps = 1;
-          const frameDuration = 1 / fps;
+      const elapsed = timestamp - lastFrameTime;
 
-          if (isPlaying) {
-            setCurrentFrame((prevFrame) => {
-              const newFrame = prevFrame + frameDuration;
-              if (newFrame >= totalFrames) {
-                videoElement.currentTime = 0;
-                setCurrentFrame(0);
-              } else {
-                videoElement.currentTime = newFrame;
-              }
-              return newFrame;
+      if (elapsed >= frameDuration) {
+        setCurrentFrame((prevFrame) => {
+          const newFrame = prevFrame + 1;
+          if (newFrame >= totalFrames) {
+            videoRefs.current.forEach((videoElement) => {
+              if (videoElement) videoElement.currentTime = 0;
             });
+            return 0;
+          } else {
+            videoRefs.current.forEach((videoElement) => {
+              if (videoElement) videoElement.currentTime = newFrame;
+            });
+            return newFrame;
           }
-        }
-      });
+        });
+
+        lastFrameTime = timestamp;
+      }
+
+      animationFrameId = requestAnimationFrame(playVideoManually);
     };
 
     if (isPlaying) {
-      intervalId = setInterval(playVideoManually, 1000);
+      animationFrameId = requestAnimationFrame(playVideoManually);
     }
 
     return () => {
-      if (intervalId) clearInterval(intervalId);
+      if (animationFrameId) cancelAnimationFrame(animationFrameId);
     };
   }, [isPlaying, videoRefs, setCurrentFrame]);
+
 
   return (
     <div>
