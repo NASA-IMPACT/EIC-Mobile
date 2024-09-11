@@ -245,21 +245,21 @@ export default function Home() {
         lastFrameTime = timestamp;
       }
 
-      const elapsed = Math.floor(timestamp - lastFrameTime);
+      const elapsed = timestamp - lastFrameTime;
 
       if (elapsed >= frameDuration) {
         setCurrentFrame((prevFrame) => {
           const newFrame = Math.floor(prevFrame + elapsed / frameDuration);
 
           if (newFrame >= totalFrames) {
-            // videoRefs.current.forEach((videoElement) => {
-            //   if (videoElement) videoElement.currentTime = 0;
-            // });
+            videoRefs.current.forEach((videoElement) => {
+              if (videoElement) videoElement.currentTime = 0;
+            });
             return 0;
           } else {
-            // videoRefs.current.forEach((videoElement) => {
-            //   if (videoElement) videoElement.currentTime = newFrame;
-            // });
+            videoRefs.current.forEach((videoElement) => {
+              if (videoElement) videoElement.currentTime = newFrame;
+            });
             return newFrame;
           }
         });
@@ -278,11 +278,6 @@ export default function Home() {
       if (animationFrameId) cancelAnimationFrame(animationFrameId);
     };
   }, [isPlaying, videoRefs, setCurrentFrame]);
-
-  useEffect(() => {
-    if (!videoRefs.current[0]) return;
-    videoRefs.current[0].currentTime = Math.floor(currentFrame);
-  }, [currentFrame, videoRefs]);
 
   return (
     <div>
