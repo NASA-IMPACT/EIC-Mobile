@@ -236,7 +236,7 @@ export default function Home() {
   useEffect(() => {
     const totalFrames = 150;
     const fps = 1;
-    const frameDuration = 100;
+    const frameDuration = 1000;
     let lastFrameTime = 0;
     let animationFrameId;
 
