@@ -249,7 +249,7 @@ export default function Home() {
 
       if (elapsed >= frameDuration) {
         setCurrentFrame((prevFrame) => {
-          const newFrame = prevFrame + 1;
+          const newFrame = Math.floor(prevFrame + elapsed / frameDuration);
           if (newFrame >= totalFrames) {
             videoRefs.current.forEach((videoElement) => {
               if (videoElement) videoElement.currentTime = 0;
@@ -263,7 +263,7 @@ export default function Home() {
           }
         });
 
-        lastFrameTime = timestamp;
+        lastFrameTime = timestamp - (elapsed % frameDuration);
       }
 
       animationFrameId = requestAnimationFrame(playVideoManually);
