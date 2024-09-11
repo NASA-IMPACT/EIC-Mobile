@@ -236,7 +236,7 @@ export default function Home() {
   useEffect(() => {
     const totalFrames = 150;
     const fps = 1;
-    const frameDuration = 1000 / fps;
+    const frameDuration = 1000;
     let lastFrameTime = 0;
     let animationFrameId;
 
@@ -245,20 +245,21 @@ export default function Home() {
         lastFrameTime = timestamp;
       }
 
-      const elapsed = timestamp - lastFrameTime;
+      const elapsed = Math.floor(timestamp - lastFrameTime);
 
       if (elapsed >= frameDuration) {
         setCurrentFrame((prevFrame) => {
           const newFrame = Math.floor(prevFrame + elapsed / frameDuration);
+
           if (newFrame >= totalFrames) {
-            videoRefs.current.forEach((videoElement) => {
-              if (videoElement) videoElement.currentTime = 0;
-            });
+            // videoRefs.current.forEach((videoElement) => {
+            //   if (videoElement) videoElement.currentTime = 0;
+            // });
             return 0;
           } else {
-            videoRefs.current.forEach((videoElement) => {
-              if (videoElement) videoElement.currentTime = newFrame;
-            });
+            // videoRefs.current.forEach((videoElement) => {
+            //   if (videoElement) videoElement.currentTime = newFrame;
+            // });
             return newFrame;
           }
         });
@@ -278,6 +279,10 @@ export default function Home() {
     };
   }, [isPlaying, videoRefs, setCurrentFrame]);
 
+  useEffect(() => {
+    if (!videoRefs.current[0]) return;
+    videoRefs.current[0].currentTime = Math.floor(currentFrame);
+  }, [currentFrame, videoRefs]);
 
   return (
     <div>
