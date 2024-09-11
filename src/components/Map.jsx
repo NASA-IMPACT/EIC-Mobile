@@ -234,49 +234,22 @@ export default function Home() {
   };
 
   useEffect(() => {
-    const totalFrames = 150;
-    const fps = 1;
-    const frameDuration = 1000 / fps;
-    let lastFrameTime = 0;
-    let animationFrameId;
 
-    const playVideoManually = (timestamp) => {
-      if (!lastFrameTime) {
-        lastFrameTime = timestamp;
-      }
-
-      const elapsed = timestamp - lastFrameTime;
-
-      if (elapsed >= frameDuration) {
-        setCurrentFrame((prevFrame) => {
-          const newFrame = prevFrame + 1;
-          if (newFrame >= totalFrames) {
-            videoRefs.current.forEach((videoElement) => {
-              if (videoElement) videoElement.currentTime = 0;
-            });
-            return 0;
-          } else {
-            videoRefs.current.forEach((videoElement) => {
-              if (videoElement) videoElement.currentTime = newFrame;
-            });
-            return newFrame;
-          }
-        });
-
-        lastFrameTime = timestamp;
-      }
-
-      animationFrameId = requestAnimationFrame(playVideoManually);
-    };
 
     if (isPlaying) {
-      animationFrameId = requestAnimationFrame(playVideoManually);
+      videoRefs.current.forEach((videoElement) => {
+        if (videoElement && videoElement.paused) {
+          videoElement.play();
+        }
+      });
+    } else {
+      videoRefs.current.forEach((videoElement) => {
+        if (videoElement && !videoElement.paused) {
+          videoElement.pause();
+        }
+      });
     }
-
-    return () => {
-      if (animationFrameId) cancelAnimationFrame(animationFrameId);
-    };
-  }, [isPlaying, videoRefs, setCurrentFrame]);
+  }, [isPlaying, videoRefs]);
 
 
   return (
