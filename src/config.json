@@ -3,7 +3,7 @@
         "name": "SSP126 Sustainability",
         "description": "Heat Index",
         "unit": "Heatmax",
-        "video": "/georeferenced_video_2_compressed_2.mp4",
+        "video": "/georeferenced_video_2.mp4",
         "service":
         "https://gis.earthdata.nasa.gov/maphost/rest/services/EIC/heatmax_median_multivariate/ImageServer",
         "datetimeRange": ["1950-01-31T00:00:00Z", "2100-12-31T23:59:59Z"],
