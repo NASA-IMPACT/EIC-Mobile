@@ -233,9 +233,17 @@ export default function Home() {
     }
   };
 
+  function isSeekable(videoElement, time) {
+    for (var i = 0; i < videoElement.seekable.length; i++) {
+      if (time >= videoElement.seekable.start(i) && time <= videoElement.seekable.end(i)) {
+        return true;
+      }
+    }
+    return false;
+  }
+
   useEffect(() => {
     const totalFrames = 150;
-    const fps = 1;
     const frameDuration = 1000;
     let lastFrameTime = 0;
     let animationFrameId;
@@ -253,12 +261,21 @@ export default function Home() {
 
           if (newFrame >= totalFrames) {
             videoRefs.current.forEach((videoElement) => {
-              if (videoElement) videoElement.currentTime = 0;
+              if (videoElement) {
+                videoElement.currentTime = 0;
+              };
             });
             return 0;
           } else {
             videoRefs.current.forEach((videoElement) => {
-              if (videoElement) videoElement.currentTime = newFrame;
+              if (videoElement) {
+                if (isSeekable(videoElement, newFrame)) {
+                  console.log(isSeekable(videoElement, newFrame));
+                  videoElement.load();
+                  videoElement.pause();
+                  videoElement.currentTime = newFrame;
+                }
+              }
             });
             return newFrame;
           }
