@@ -1,4 +1,7 @@
 import Point from '@arcgis/core/geometry/Point';
+import FeatureLayer from '@arcgis/core/layers/FeatureLayer';
+
+
 import { useContext, useEffect, useRef } from 'react';
 import Graphic from '@arcgis/core/Graphic';
 import config from '../config.json';
@@ -36,6 +39,23 @@ export default function Home() {
 
     let layerList = [];
 
+    const worldCountriesLayer = new FeatureLayer({
+      url: "https://services.arcgis.com/P3ePLMYs2RVChkJx/arcgis/rest/services/World_Countries/FeatureServer/0",
+      opacity: 1,
+      outFields: ["*"],
+      renderer: {
+        type: "simple",
+        symbol: {
+          type: "simple-fill",
+          color: [200, 200, 200, 0.1],
+          outline: {
+            color: [255, 255, 255, 0.5],
+            width: 1
+          }
+        }
+      }
+    });
+
     config.forEach((layer, index) => {
       const element = new VideoElement({
         video: layer.video,
@@ -45,9 +65,6 @@ export default function Home() {
             ymin: -90,
             xmax: 180,
             ymax: 90,
-            spatialReference: {
-              wkid: 4326
-            }
           })
         })
       });
@@ -59,7 +76,6 @@ export default function Home() {
       });
 
       layerList.push(mediaLayer);
-
       element.when(() => {
         const videoElement = element.content;
         videoRefs.current[index] = videoElement;
@@ -67,6 +83,8 @@ export default function Home() {
         videoElement.currentTime = currentFrame;
       });
     });
+
+    layerList.push(worldCountriesLayer);
 
     const map = new Map({
       layers: layerList
