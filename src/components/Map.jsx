@@ -246,7 +246,7 @@ export default function Home() {
 
   return (
     <div>
-      <div ref={mapDiv} style={{ height: '100vh' }}></div>
+      <div className='map' ref={mapDiv} style={{ height: '100vh' }}></div>
     </div>
   );
 }

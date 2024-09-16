@@ -86,12 +86,12 @@ export default function Panel() {
         <div className='fixed bottom-0 left-1/2 transform -translate-x-1/2 shadow-lg backdrop-blur-lg z-10 flex
                         w-full gap-[20px] lg:w-[762px] lg:left-1/2 lg:-translate-x-1/2 lg:gap-[60px]'>
             <TabGroup style={{ width: '100%', height: '100%'}} defaultIndex={selectedIndex} onChange={setSelectedIndex}>
-                <StyledTabList className="absolute left-1/2 transform -translate-x-1/2 -top-16 text-white p-2 flex space-x-4 overflow-x-auto whitespace-nowrap">
+                <StyledTabList className="dataset-choice absolute left-1/2 transform -translate-x-1/2 -top-16 text-white p-2 flex space-x-4 overflow-x-auto whitespace-nowrap">
                     {config.map((dataset, index) => (
                         <Tab
                             key={dataset.name}
                             className={({ selected }) =>
-                                `px-4 py-2 text-xs rounded-sm focus:outline-none ${
+                                `dataset-${index} px-4 py-2 text-xs rounded-sm focus:outline-none ${
                                     selected ? 'bg-blue-600 text-white' : 'bg-black bg-opacity-90 text-white'
                                 }`
                             }
@@ -161,7 +161,7 @@ export default function Panel() {
                                 </div>
                             </div>
 
-                            <div className="w-full h-[200px] overflow-y-auto">
+                            <div className="chart w-full h-[200px] overflow-y-auto">
                                 <LineChart selectedIndex={selectedIndex} />
                             </div>
                         </div>

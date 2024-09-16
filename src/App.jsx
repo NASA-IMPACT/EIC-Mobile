@@ -3,6 +3,7 @@ import config from './config.json';
 import Map from './components/Map';
 import Panel from './components/Panel';
 import EICLogo from './components/Logo';
+import Tour from './components/Tour';
 import { VitalsDataContext, MapViewContext, ChartDataContext, CurrentJSONContext, DataSelectionContext } from './contexts/AppContext';
 import { VideoProvider } from './contexts/VideoContext';
 
@@ -20,6 +21,7 @@ export default function App() {
           <VitalsDataContext.Provider value={{ vitalsData, setVitalsData }}>
             <ChartDataContext.Provider value={{ chartData, setChartData }}>
               <VideoProvider>
+                <Tour />
                 <EICLogo />
                 <Panel />
                 <Map />
