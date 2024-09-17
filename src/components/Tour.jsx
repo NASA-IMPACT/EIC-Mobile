@@ -1,5 +1,6 @@
-import React from 'react';
+import React, { useState } from 'react';
 import Joyride from 'react-joyride';
+import TourButton from './TourButton';
 
 import useLocalStorage from '../hooks/useLocalStorage';
 
@@ -13,7 +14,7 @@ const steps = [
   {
     target: '.map',
     content: 'Select a location on the map to view data.',
-    placement: 'auto',
+    placement: 'top-start',
   },
   {
     target: '.dataset-choice',
@@ -39,21 +40,38 @@ const steps = [
 
 export default function Tour() {
   const [tourComplete, setTourComplete] = useLocalStorage('tourComplete', false);
-
-  if (tourComplete) return null
+  const [helpers, setHelpers] = useState({});
+  const [run, setRun] = useState(!tourComplete);
 
   const handleJoyrideCallback = (data) => {
-    if (data.status === 'finished' || data.status === 'skipped') setTourComplete(true)
+    if (data.status === 'finished' || data.status === 'skipped' || data.action === 'close') {
+      setTourComplete(true)
+      setRun(false)
+      helpers.reset()
+    }
+  }
+
+  const handleGetHelpers = (helpers) => {
+    setHelpers(helpers)
+  }
+
+  const handleClick = () => {
+    setRun(!run)
   }
 
   return (
-    <Joyride
-      steps={steps}
-      callback={handleJoyrideCallback}
-      continuous={true}
-      showProgress={true}
-      showSkipButton={true}
-      disableOverlay={true}
-    />
+    <div>
+      <TourButton onClick={handleClick} />
+      <Joyride
+        steps={steps}
+        callback={handleJoyrideCallback}
+        continuous={true}
+        showProgress={true}
+        showSkipButton={true}
+        disableOverlay={true}
+        getHelpers={handleGetHelpers}
+        run={run}
+      />
+    </div>
   );
 }
