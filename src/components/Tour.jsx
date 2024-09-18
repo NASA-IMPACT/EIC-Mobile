@@ -1,5 +1,5 @@
 import React, { useState, useContext, useEffect } from 'react';
-import { CurrentJSONContext } from '../contexts/AppContext';
+import { DataSelectionContext } from '../contexts/AppContext';
 import Joyride from 'react-joyride';
 import TourButton from './TourButton';
 import useLocalStorage from '../hooks/useLocalStorage';
@@ -8,7 +8,7 @@ export default function Tour() {
   const [tourComplete, setTourComplete] = useLocalStorage('tourComplete', false)
   const [helpers, setHelpers] = useState({})
   const [run, setRun] = useState(!tourComplete)
-  const { currentJSON } = useContext(CurrentJSONContext)
+  const { dataSelection } = useContext(DataSelectionContext)
 
   const steps = [
     {
@@ -26,8 +26,8 @@ export default function Tour() {
     },
     {
       target: '.dataset-choice',
-      title: 'Select a dataset to view.',
-      content: `${currentJSON?.name}: ${currentJSON?.description}`,
+      title: `Select a ${dataSelection[0].datasetName} dataset`,
+      content: `${dataSelection[1]?.name}: ${dataSelection[1]?.description}`,
       disableBeacon: true,
     },
     {
