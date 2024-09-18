@@ -92,7 +92,7 @@ export default function Panel() {
                             key={dataset.name}
                             className={({ selected }) =>
                                 `dataset-${index} px-4 py-2 text-xs rounded-sm focus:outline-none ${
-                                    selected ? 'bg-blue-600 text-white' : 'bg-black bg-opacity-90 text-white'
+                                    selected ? 'selected-dataset bg-blue-600 text-white' : 'bg-black bg-opacity-90 text-white'
                                 }`
                             }
                             onClick={() => changeLayer(dataset, index)}

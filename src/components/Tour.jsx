@@ -1,47 +1,42 @@
-import React, { useState } from 'react';
+import React, { useState, useContext } from 'react';
+import { CurrentJSONContext } from '../contexts/AppContext';
 import Joyride from 'react-joyride';
 import TourButton from './TourButton';
-
 import useLocalStorage from '../hooks/useLocalStorage';
 
-const steps = [
-  {
-    target: 'body',
-    title: 'Welcome to EIC Mobile!',
-    content: 'This tour will guide you through the app. You can skip this tour at any time.',
-    placement: 'center',
-  },
-  {
-    target: '.map',
-    content: 'Select a location on the map to view data.',
-    placement: 'top-start',
-  },
-  {
-    target: '.dataset-choice',
-    content: 'Select a dataset to view.',
-  },
-  {
-    target: '.dataset-0',
-    content: 'Dataset 1',
-  },
-  {
-    target: '.dataset-1',
-    content: 'Dataset 2',
-  },
-  {
-    target: '.dataset-2',
-    content: 'Dataset 3',
-  },
-  {
-    target: '.chart',
-    content: 'View the data in a chart.',
-  }
-]
-
 export default function Tour() {
-  const [tourComplete, setTourComplete] = useLocalStorage('tourComplete', false);
-  const [helpers, setHelpers] = useState({});
-  const [run, setRun] = useState(!tourComplete);
+  const [tourComplete, setTourComplete] = useLocalStorage('tourComplete', false)
+  const [helpers, setHelpers] = useState({})
+  const [run, setRun] = useState(!tourComplete)
+  const { currentJSON } = useContext(CurrentJSONContext)
+
+  const steps = [
+    {
+      target: 'body',
+      title: 'Welcome to EIC Mobile!',
+      content: 'This tour will guide you through the app. You can skip this tour at any time.',
+      placement: 'center',
+    },
+    {
+      target: '.map',
+      content: 'Select a location on the map to view data.',
+      placement: 'top-start',
+    },
+    {
+      target: '.dataset-choice',
+      content: 'Select a dataset to view.',
+    },
+    {
+      target: '.selected-dataset',
+      title: `${currentJSON?.name}`,
+      content: `${currentJSON?.description}`,
+    },
+    {
+      target: '.chart',
+      content: 'View the data in a chart.',
+    }
+  ]
+  
 
   const handleJoyrideCallback = (data) => {
     if (data.status === 'finished' || data.status === 'skipped' || data.action === 'close') {
@@ -73,5 +68,5 @@ export default function Tour() {
         run={run}
       />
     </div>
-  );
+  )
 }
