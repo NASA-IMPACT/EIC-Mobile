@@ -1,4 +1,4 @@
-import React, { useState, useContext } from 'react';
+import React, { useState, useContext, useEffect } from 'react';
 import { CurrentJSONContext } from '../contexts/AppContext';
 import Joyride from 'react-joyride';
 import TourButton from './TourButton';
@@ -24,12 +24,8 @@ export default function Tour() {
     },
     {
       target: '.dataset-choice',
-      content: 'Select a dataset to view.',
-    },
-    {
-      target: '.selected-dataset',
-      title: `${currentJSON?.name}`,
-      content: `${currentJSON?.description}`,
+      title: 'Select a dataset to view.',
+      content: `${currentJSON?.name}: ${currentJSON?.description}`,
     },
     {
       target: '.chart',
