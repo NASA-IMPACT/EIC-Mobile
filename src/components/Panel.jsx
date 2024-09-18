@@ -1,174 +1,306 @@
-import styled from 'styled-components';
 import LineChart from './LineChart';
-import { Tab, TabGroup, TabList, TabPanels, TabPanel, Switch } from '@headlessui/react';
-import { useContext, useState, useEffect, useMemo } from 'react';
+import { useContext, useState, useMemo } from 'react';
 import config from '../config.json';
-import { DataSelectionContext, MapViewContext, CurrentJSONContext, ChartDataContext } from '../contexts/AppContext';
+import {
+    DataSelectionContext,
+    MapViewContext,
+    ChartDataContext
+} from '../contexts/AppContext';
 import { VideoContext } from '../contexts/VideoContext';
-import { BackwardIcon, PlayIcon, PauseIcon, ForwardIcon } from '@heroicons/react/24/outline';
-
-const StyledTabList = styled(TabList)`
-  @media (max-width: 768px) {
-    overflow-y: visible;
-    overflow-x: auto;
-    width: 100%;
-
-    &::-webkit-scrollbar {
-      display: none;
-    }
-
-    scrollbar-width: none;
-
-    -ms-overflow-style: none;
-  }
-`;
+import {
+    BackwardIcon,
+    PlayIcon,
+    PauseIcon,
+    ForwardIcon
+} from '@heroicons/react/24/outline';
+import { Switch } from '@headlessui/react';
+import { FPS, MANUAL_FORWARD_BACKWARD_STEP_SIZE } from '../utils/constants';
 
 export default function Panel() {
-    const { isPlaying, playVideo, pauseVideo } = useContext(VideoContext);
+    const {
+        isPlaying,
+        setIsPlaying,
+        currentFrame,
+        setCurrentFrame,
+        videoRefs
+    } = useContext(VideoContext);
     const { mapView } = useContext(MapViewContext);
     const { setDataSelection } = useContext(DataSelectionContext);
-    const { setCurrentJSON } = useContext(CurrentJSONContext);
     const [isFahrenheit, setIsFahrenheit] = useState(true);
     const { chartData } = useContext(ChartDataContext);
 
-    const [selectedIndex, setSelectedIndex] = useState(0);
+    const [selectedDatasetIndex, setSelectedDatasetIndex] = useState(0);
+    const [selectedVariableIndex, setSelectedVariableIndex] = useState(0);
 
     const handlePlayPause = () => {
         if (isPlaying) {
-          pauseVideo();
+            setCurrentFrame(
+                videoRefs.current[selectedVariableIndex].currentTime * FPS
+            );
         } else {
-          playVideo();
+            videoRefs.current[selectedVariableIndex].currentTime =
+                currentFrame / FPS;
         }
+        setIsPlaying(!isPlaying);
     };
 
-    const changeLayer = (item, index) => {
-        setDataSelection([false, 0]);
+    // Forward 10 years (to be adjusted based on the final datasets)
+    const handleForward = () => {
+        const video = videoRefs.current[selectedVariableIndex];
+        const totalFrames = video.duration * FPS;
+        const stepSize = MANUAL_FORWARD_BACKWARD_STEP_SIZE;
 
-        mapView.map.layers.forEach(layer => {
-            if (layer.title !== item.name && layer.title !== 'Geodesic-Buffer' && layer.title !== 'Geodesic-Point') {
-                layer.visible = false;
-            } else if (layer.title === item.name) {
-                layer.visible = true;
+        const newFrame =
+            currentFrame + stepSize >= totalFrames
+                ? (currentFrame + stepSize) % totalFrames
+                : currentFrame + stepSize;
+
+        setCurrentFrame(newFrame);
+        video.currentTime = newFrame / FPS;
+    };
+
+    // Backward 10 years (to be adjusted based on the final datasets)
+    const handleBackward = () => {
+        const video = videoRefs.current[selectedVariableIndex];
+        const totalFrames = video.duration * FPS;
+        const stepSize = MANUAL_FORWARD_BACKWARD_STEP_SIZE;
+
+        const newFrame =
+            currentFrame - stepSize < 0
+                ? totalFrames + (currentFrame - stepSize)
+                : currentFrame - stepSize;
+
+        setCurrentFrame(newFrame);
+        video.currentTime = newFrame / FPS;
+    };
+
+    const changeDataset = (datasetIndex) => {
+        setSelectedDatasetIndex(datasetIndex);
+        setSelectedVariableIndex(0);
+
+        const selectedDataset = config.datasets[datasetIndex];
+        const selectedVariable = selectedDataset.variables[0];
+
+        setDataSelection([selectedDataset, selectedVariable]);
+    };
+
+    const changeVariable = (variableIndex) => {
+        setSelectedVariableIndex(variableIndex);
+
+        const selectedDataset = config.datasets[selectedDatasetIndex];
+        const selectedVariable = selectedDataset.variables[variableIndex];
+
+        setDataSelection([selectedDataset, selectedVariable]);
+
+        mapView.map.layers.forEach((layer) => {
+            if (
+                layer.title === selectedVariable.name ||
+                layer.title === 'World Countries' ||
+                layer.title === 'Geodesic-Buffer' ||
+                layer.title === 'Geodesic-Point'
+            ) {
+                layer.opacity = 1;
+            } else {
+                layer.opacity = 0;
             }
         });
-
-        const layer = mapView.map.layers.find(layer => layer.title === item.name);
-
-        if (layer) {
-            layer.visible = true;
-
-            const currentProduct = config.find(product => product.name === layer.title);
-            setCurrentJSON(currentProduct);
-        }
-
-        setSelectedIndex(index);
     };
 
-    useEffect(() => {
-        if (mapView) {
-            const initialLayer = config[0];
-            changeLayer(initialLayer, 0);
-        }
-    }, [mapView]);
-
     const getMaxValuesForYears = useMemo(() => {
-        const years = [2000, 2025, 2050, 2075, 2100];
-        const selectedVariable = selectedIndex === 0 ? 'heatmax_ssp126' : selectedIndex === 1 ? 'heatmax_ssp245' : 'heatmax_ssp370';
+        const years = [1950, 1975, 2000, 2025, 2050, 2075, 2100];
+        const selectedDataset = config.datasets[selectedDatasetIndex];
+        const selectedVariable =
+            selectedDataset.variables[selectedVariableIndex];
+        const selectedVarKey = selectedVariable
+            ? selectedVariable.variable
+            : '';
 
         return years.map((year) => {
-            const dataForYear = chartData.find(data => data.x === String(year));
-            return dataForYear ? Math.round(dataForYear[selectedVariable]) : 'N/A';
+            const dataForYear = chartData.find(
+                (data) => data.x === String(year)
+            );
+            const value = dataForYear
+                ? Math.round(dataForYear[selectedVarKey])
+                : 'N/A';
+            return { year, value };
         });
-    }, [chartData, selectedIndex]);
+    }, [chartData, selectedDatasetIndex, selectedVariableIndex]);
 
+    const selectedDataset = config.datasets[selectedDatasetIndex];
 
     return (
-        <div className='fixed bottom-0 left-1/2 transform -translate-x-1/2 shadow-lg backdrop-blur-lg z-10 flex
-                        w-full gap-[20px] lg:w-[762px] lg:left-1/2 lg:-translate-x-1/2 lg:gap-[60px]'>
-            <TabGroup style={{ width: '100%', height: '100%'}} defaultIndex={selectedIndex} onChange={setSelectedIndex}>
-                <StyledTabList className="dataset-choice absolute left-1/2 transform -translate-x-1/2 -top-16 text-white p-2 flex space-x-4 overflow-x-auto whitespace-nowrap">
-                    {config.map((dataset, index) => (
-                        <Tab
-                            key={dataset.name}
-                            className={({ selected }) =>
-                                `dataset-${index} px-4 py-2 text-xs rounded-sm focus:outline-none ${
-                                    selected ? 'selected-dataset bg-blue-600 text-white' : 'bg-black bg-opacity-90 text-white'
-                                }`
-                            }
-                            onClick={() => changeLayer(dataset, index)}
-                        >
-                            {dataset.name}
-                        </Tab>
-                    ))}
-                </StyledTabList>
+        <div className="dataset-choice fixed bottom-0 left-1/2 transform -translate-x-1/2 shadow-lg z-10 flex w-full lg:w-[762px]">
+            <div style={{ width: '100%', height: '100%' }}>
+                {/* Tabs Row */}
+                <div className="flex items-center rounded-t-sm mb-2 overflow-x-auto whitespace-nowrap">
+                    {/* Dataset Tabs */}
+                    <div className="flex">
+                        {config.datasets.map((dataset, datasetIndex) => (
+                            <button
+                                key={dataset.datasetName}
+                                className={`px-4 py-2 text-xs focus:outline-none ${
+                                    selectedDatasetIndex === datasetIndex
+                                        ? 'bg-blue-600 text-white'
+                                        : 'bg-gray-400 text-white'
+                                } ${datasetIndex === 0 ? 'rounded-l-sm' : ''} ${
+                                    datasetIndex === config.datasets.length - 1
+                                        ? 'rounded-r-sm'
+                                        : ''
+                                }`}
+                                onClick={() => changeDataset(datasetIndex)}
+                                style={{
+                                    borderRight:
+                                        datasetIndex <
+                                        config.datasets.length - 1
+                                            ? '1px solid #ffffff'
+                                            : ''
+                                }}
+                            >
+                                {dataset.datasetName}
+                            </button>
+                        ))}
+                    </div>
 
-                <TabPanels style={{ height: '350px' }}>
-                    {config.map((dataset, index) => (
-                        <TabPanel style={{ height: '100%' }} key={index}>
-                        <div className="flex flex-col w-full h-full rounded-t-xl bg-black bg-opacity-70 shadow-lg backdrop-blur-lg p-6 gap-[20px] lg:gap-[20px]">
+                    <div className="h-6 border-l border-white mx-0 ml-8 mr-8"></div>
 
-                            <div className="flex justify-between items-center w-full">
-                                <h2 className="text-white text-2xl">Heat Index</h2>
-
-                                <div className="absolute left-1/2 transform -translate-x-1/2 flex gap-4">
-                                    <div className="bg-transparent text-white text-xl cursor-pointer">
-                                        <BackwardIcon className="h-6 w-6 text-white" />
-                                    </div>
-
-                                    <div className="bg-transparent text-white text-xl cursor-pointer" onClick={handlePlayPause}>
-                                        {isPlaying ? (
-                                            <PauseIcon className="h-6 w-6 text-white" />
-                                        ) : (
-                                            <PlayIcon className="h-6 w-6 text-white" />
-                                        )}
-                                    </div>
-
-                                    <div className="bg-transparent text-white text-xl cursor-pointer">
-                                        <ForwardIcon className="h-6 w-6 text-white" />
-                                    </div>
-                                </div>
-                            </div>
-
-                            <div className="flex items-center justify-start w-full gap-4 relative">
-                                <span className="text-white text-lg">°C</span>
-
-                                <Switch
-                                    checked={isFahrenheit}
-                                    onChange={setIsFahrenheit}
-                                    className={`${
-                                        isFahrenheit ? 'bg-blue-600' : 'bg-gray-400'
-                                    } relative inline-flex items-center h-6 rounded-full w-11`}
+                    {/* Variable Tabs */}
+                    <div className="flex">
+                        {selectedDataset.variables.map(
+                            (variable, variableIndex) => (
+                                <button
+                                    key={variable.name}
+                                    className={`px-4 py-2 text-xs focus:outline-none ${
+                                        selectedVariableIndex === variableIndex
+                                            ? 'bg-blue-600 text-white'
+                                            : 'bg-gray-400 text-white'
+                                    } ${
+                                        variableIndex === 0
+                                            ? 'rounded-l-sm'
+                                            : ''
+                                    } ${
+                                        variableIndex ===
+                                        selectedDataset.variables.length - 1
+                                            ? 'rounded-r-sm'
+                                            : ''
+                                    }`}
+                                    onClick={() =>
+                                        changeVariable(variableIndex)
+                                    }
+                                    style={{
+                                        borderRight:
+                                            variableIndex <
+                                            selectedDataset.variables.length - 1
+                                                ? '1px solid #ffffff'
+                                                : ''
+                                    }}
                                 >
-                                    <span
-                                        className={`${
-                                            isFahrenheit ? 'translate-x-6' : 'translate-x-1'
-                                        } inline-block w-4 h-4 transform bg-white rounded-full transition`}
-                                    />
-                                </Switch>
+                                    {variable.name}
+                                </button>
+                            )
+                        )}
+                    </div>
+                </div>
 
-                                <span className="text-white text-lg">°F</span>
+                <div className="flex flex-col w-full h-full bg-black bg-opacity-70 shadow-lg backdrop-blur-lg p-6 gap-5">
+                    <div className="flex justify-between items-center w-full">
+                        {/* Heading */}
+                        <h2 className="text-white text-sm md:text-2xl">
+                            {selectedDataset.datasetName}
+                        </h2>
 
-                                <div className="flex w-full justify-between relative ml-8">
-                                    {getMaxValuesForYears.map((value, idx) => (
-                                        <div key={idx} className="relative text-white text-xl" style={{ position: 'absolute', top: '-15px', left: `${12 + idx * 19}%` }}>
-                                            {value === 'N/A' ? (
-                                                <div className="w-16 h-6 bg-neutral-950 bg-opacity-90 rounded animate-pulse"></div>
-                                            ) : (
-                                                <span>{value} {isFahrenheit ? '°F' : '°C'}</span>
-                                            )}
-                                        </div>
-                                    ))}
-                                </div>
+                        {/* Controls */}
+                        <div className="flex gap-2 items-center ml-auto md:absolute md:left-1/2 md:transform md:-translate-x-1/2">
+                            <div
+                                className="bg-transparent text-white cursor-pointer"
+                                onClick={handleBackward}
+                            >
+                                <BackwardIcon className="h-4 w-4 md:h-6 md:w-6 text-white" />
                             </div>
 
-                            <div className="chart w-full h-[200px] overflow-y-auto">
-                                <LineChart selectedIndex={selectedIndex} />
+                            <div
+                                className="bg-blue-600 text-white cursor-pointer rounded-full p-1"
+                                onClick={handlePlayPause}
+                            >
+                                {isPlaying ? (
+                                    <PauseIcon className="h-4 w-4 md:h-6 md:w-6 text-white" />
+                                ) : (
+                                    <PlayIcon className="h-4 w-4 md:h-6 md:w-6 text-white" />
+                                )}
+                            </div>
+
+                            <div
+                                className="bg-transparent text-white cursor-pointer"
+                                onClick={handleForward}
+                            >
+                                <ForwardIcon className="h-4 w-4 md:h-6 md:w-6 text-white" />
                             </div>
                         </div>
-                        </TabPanel>
-                    ))}
-                </TabPanels>
-            </TabGroup>
+                    </div>
+
+                    <div className="w-full border-t border-gray-500"></div>
+
+                    {/* Chart */}
+                    <div className="w-full h-[220px] md:h-[250px] flex items-start overflow-x-auto md:overflow-visible">
+                        <div className="flex items-center mr-4">
+                            <span className="text-white text-lg mr-2">°C</span>
+
+                            <Switch
+                                checked={isFahrenheit}
+                                onChange={setIsFahrenheit}
+                                className={`${
+                                    isFahrenheit ? 'bg-blue-600' : 'bg-gray-400'
+                                } relative inline-flex items-center h-4 rounded-full w-8`}
+                            >
+                                <span
+                                    className={`${
+                                        isFahrenheit
+                                            ? 'translate-x-4'
+                                            : 'translate-x-1'
+                                    } inline-block w-3 h-3 transform bg-white rounded-full transition`}
+                                />
+                            </Switch>
+
+                            <span className="text-white text-lg ml-2">°F</span>
+                        </div>
+
+                        <div className="flex-1" style={{ minWidth: '600px' }}>
+                            <div
+                                className="flex justify-between mb-2 ml-3"
+                                style={{ width: 'calc(100% + 8px)' }}
+                            >
+                                {getMaxValuesForYears.map((item, idx) => (
+                                    <div
+                                        key={idx}
+                                        className="relative text-center"
+                                    >
+                                        {item.value === 'N/A' ? (
+                                            <div className="bg-blue-600 bg-opacity-90 rounded"></div>
+                                        ) : (
+                                            <div className="flex flex-col items-center justify-center py-1 px-2 bg-neutral-800 rounded-sm">
+                                                <span className="text-white text-xl font-bold">
+                                                    {item.value}
+                                                </span>
+                                                <span className="text-white text-xs">
+                                                    {item.year}
+                                                </span>
+                                            </div>
+                                        )}
+                                    </div>
+                                ))}
+                            </div>
+
+                            <div
+                                className="chart w-full"
+                                style={{ minWidth: '600px' }}
+                            >
+                                <LineChart
+                                    selectedIndex={selectedVariableIndex}
+                                />
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
         </div>
     );
 }

@@ -1,89 +1,164 @@
-[
-    {
-        "name": "SSP126 Sustainability",
-        "description": "Heat Index",
-        "unit": "Heatmax",
-        "video": "/heatmax_126_12month.mp4",
-        "service":
-        "https://gis.earthdata.nasa.gov/maphost/rest/services/EIC/heatmax_median_multivariate/ImageServer",
-        "datetimeRange": ["1950-01-31T00:00:00Z", "2100-12-31T23:59:59Z"],
-        "wcs": false,
-        "active": true,
-        "vitals": {
-            "globalMin": 0,
-            "globalMax": 0,
-            "globalAverage": 0,
-            "globalTrend": 0
-        },
-        "tour": [
-            {
-                "stop": 0,
-                "location": {
-                    "latitude": 0,
-                    "longitude": 0,
-                    "zoom": 2,
-                    "delay": 10000
+{
+    "datasets": [
+        {
+            "datasetName": "Max Temperature",
+            "variables": [
+                {
+                    "name": "SSP126",
+                    "description": "Heat Index",
+                    "variable": "heatmax_ssp126",
+                    "unit": "Heatmax",
+                    "video": "/test-videos/composited_12fps_g15_crf18.mp4",
+                    "service":
+                    "https://gis.earthdata.nasa.gov/maphost/rest/services/EIC/heatmax_median_multivariate/ImageServer",
+                    "datetimeRange": ["1950-01-31T00:00:00Z", "2100-12-31T23:59:59Z"],
+                    "wcs": false,
+                    "active": true,
+                    "vitals": {
+                        "globalMin": 0,
+                        "globalMax": 0,
+                        "globalAverage": 0,
+                        "globalTrend": 0
+                    },
+                    "tour": [
+                        {
+                            "stop": 0,
+                            "location": {
+                                "latitude": 0,
+                                "longitude": 0,
+                                "zoom": 2,
+                                "delay": 10000
+                            },
+                            "text": "This tour demonstrates the global distribution of the Monthly Maximum Heat Index (Heatmax), highlighting the areas most affected by extreme heat."
+                        }
+                    ]
                 },
-                "text": "This tour demonstrates the global distribution of the Monthly Maximum Heat Index (Heatmax), highlighting the areas most affected by extreme heat."
-            }
-        ]
-    },
-    {
-        "name": "SSP245 Middle of the road",
-        "description": "Heat Index",
-        "unit": "Heatmax",
-        "video": "/heatmax_126_12month.mp4",
-        "service":
-        "https://gis.earthdata.nasa.gov/maphost/rest/services/EIC/heatmax_median_multivariate/ImageServer",
-        "datetimeRange": ["1950-01-31T00:00:00Z", "2100-12-31T23:59:59Z"],
-        "wcs": false,
-        "active": true,
-        "vitals": {
-            "globalMin": 0,
-            "globalMax": 0,
-            "globalAverage": 0,
-            "globalTrend": 0
-        },
-        "tour": [
-            {
-                "stop": 0,
-                "location": {
-                    "latitude": 0,
-                    "longitude": 0,
-                    "zoom": 2,
-                    "delay": 10000
+                {
+                    "name": "SSP245",
+                    "description": "Heat Index",
+                    "unit": "Heatmax",
+                    "variable": "heatmax_ssp245",
+                    "video": "/test-videos/composited_12fps_g15_crf18.mp4",
+                    "service":
+                    "https://gis.earthdata.nasa.gov/maphost/rest/services/EIC/heatmax_median_multivariate/ImageServer",
+                    "datetimeRange": ["1950-01-31T00:00:00Z", "2100-12-31T23:59:59Z"],
+                    "wcs": false,
+                    "active": true,
+                    "vitals": {
+                        "globalMin": 0,
+                        "globalMax": 0,
+                        "globalAverage": 0,
+                        "globalTrend": 0
+                    },
+                    "tour": [
+                        {
+                            "stop": 0,
+                            "location": {
+                                "latitude": 0,
+                                "longitude": 0,
+                                "zoom": 2,
+                                "delay": 10000
+                            },
+                            "text": "This tour demonstrates the global distribution of the Monthly Maximum Heat Index (Heatmax), highlighting the areas most affected by extreme heat."
+                        }
+                    ]
                 },
-                "text": "This tour demonstrates the global distribution of the Monthly Maximum Heat Index (Heatmax), highlighting the areas most affected by extreme heat."
-            }
-        ]
-    },
-    {
-        "name": "SSP370 Regional rivalry",
-        "description": "Heat Index",
-        "unit": "Heatmax",
-        "video": "/heatmax_126_12month.mp4",
-        "service":
-        "https://gis.earthdata.nasa.gov/maphost/rest/services/EIC/heatmax_median_multivariate/ImageServer",
-        "datetimeRange": ["1950-01-31T00:00:00Z", "2100-12-31T23:59:59Z"],
-        "wcs": false,
-        "active": true,
-        "vitals": {
-            "globalMin": 0,
-            "globalMax": 0,
-            "globalAverage": 0,
-            "globalTrend": 0
-        },
-        "tour": [
-            {
-                "stop": 0,
-                "location": {
-                    "latitude": 0,
-                    "longitude": 0,
-                    "zoom": 2,
-                    "delay": 10000
+                {
+                    "name": "SSP370",
+                    "description": "Heat Index",
+                    "unit": "Heatmax",
+                    "variable": "heatmax_ssp370",
+                    "video": "/test-videos/composited_12fps_g15_crf18.mp4",
+                    "service":
+                    "https://gis.earthdata.nasa.gov/maphost/rest/services/EIC/heatmax_median_multivariate/ImageServer",
+                    "datetimeRange": ["1950-01-31T00:00:00Z", "2100-12-31T23:59:59Z"],
+                    "wcs": false,
+                    "active": true,
+                    "vitals": {
+                        "globalMin": 0,
+                        "globalMax": 0,
+                        "globalAverage": 0,
+                        "globalTrend": 0
+                    },
+                    "tour": [
+                        {
+                            "stop": 0,
+                            "location": {
+                                "latitude": 0,
+                                "longitude": 0,
+                                "zoom": 2,
+                                "delay": 10000
+                            },
+                            "text": "This tour demonstrates the global distribution of the Monthly Maximum Heat Index (Heatmax), highlighting the areas most affected by extreme heat."
+                        }
+                    ]
                 },
-                "text": "This tour demonstrates the global distribution of the Monthly Maximum Heat Index (Heatmax), highlighting the areas most affected by extreme heat."
-            }
-        ]
-    }
-]
+                {
+                    "name": "SSP585",
+                    "description": "Heat Index",
+                    "unit": "Heatmax",
+                    "video": "/test-videos/composited_12fps_g15_crf18.mp4",
+                    "variable": "heatmax_ssp585",
+                    "service":
+                    "https://gis.earthdata.nasa.gov/maphost/rest/services/EIC/heatmax_median_multivariate/ImageServer",
+                    "datetimeRange": ["1950-01-31T00:00:00Z", "2100-12-31T23:59:59Z"],
+                    "wcs": false,
+                    "active": true,
+                    "vitals": {
+                        "globalMin": 0,
+                        "globalMax": 0,
+                        "globalAverage": 0,
+                        "globalTrend": 0
+                    },
+                    "tour": [
+                        {
+                            "stop": 0,
+                            "location": {
+                                "latitude": 0,
+                                "longitude": 0,
+                                "zoom": 2,
+                                "delay": 10000
+                            },
+                            "text": "This tour demonstrates the global distribution of the Monthly Maximum Heat Index (Heatmax), highlighting the areas most affected by extreme heat."
+                        }
+                    ]
+                }
+            ]
+        },
+        {
+            "datasetName": "Precipitation (TBD)",
+            "variables": [
+                {
+                    "name": "TBD",
+                    "description": "Heat Index",
+                    "unit": "Heatmax",
+                    "variable": "heatmax_ssp126",
+                    "video": "/test-videos/composited_12fps_g15_crf18.mp4",
+                    "service":
+                    "https://gis.earthdata.nasa.gov/maphost/rest/services/EIC/heatmax_median_multivariate/ImageServer",
+                    "datetimeRange": ["1950-01-31T00:00:00Z", "2100-12-31T23:59:59Z"],
+                    "wcs": false,
+                    "active": true,
+                    "vitals": {
+                        "globalMin": 0,
+                        "globalMax": 0,
+                        "globalAverage": 0,
+                        "globalTrend": 0
+                    },
+                    "tour": [
+                        {
+                            "stop": 0,
+                            "location": {
+                                "latitude": 0,
+                                "longitude": 0,
+                                "zoom": 2,
+                                "delay": 10000
+                            },
+                            "text": "This tour demonstrates the global distribution of the Monthly Maximum Heat Index (Heatmax), highlighting the areas most affected by extreme heat."
+                        }
+                    ]
+                }
+            ]
+        }
+    ]
+}
