@@ -7,7 +7,7 @@ const StyledButton = styled.button`
     top: 245px;
     right: 15px;
     background-color: #242424;
-    color: #fff;
+    color: #adadad;
     border: none;
     cursor: pointer;
     z-index: 50;
