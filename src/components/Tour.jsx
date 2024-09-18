@@ -16,20 +16,24 @@ export default function Tour() {
       title: 'Welcome to EIC Mobile!',
       content: 'This tour will guide you through the app. You can skip this tour at any time.',
       placement: 'center',
+      disableBeacon: true,
     },
     {
       target: '.map',
       content: 'Select a location on the map to view data.',
       placement: 'top-start',
+      disableBeacon: true,
     },
     {
       target: '.dataset-choice',
       title: 'Select a dataset to view.',
       content: `${currentJSON?.name}: ${currentJSON?.description}`,
+      disableBeacon: true,
     },
     {
       target: '.chart',
       content: 'View the data in a chart.',
+      disableBeacon: true,
     }
   ]
   
