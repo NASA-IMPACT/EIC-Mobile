@@ -26,13 +26,13 @@ export default function Tour() {
     },
     {
       target: '.dataset-choice',
-      title: `Select a ${dataSelection[0].datasetName} dataset`,
-      content: `${dataSelection[1]?.name}: ${dataSelection[1]?.description}`,
+      title: `Select a dataset to view`,
+      content: `${dataSelection?.[0]?.datasetName || ''}: ${dataSelection?.[1]?.name || ''} ${dataSelection?.[1]?.description || ''}`,
       disableBeacon: true,
     },
     {
       target: '.chart',
-      content: 'View the data in a chart.',
+      content: 'View the data in the chart.',
       disableBeacon: true,
     }
   ]
