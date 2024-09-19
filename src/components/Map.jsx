@@ -2,7 +2,7 @@ import Point from '@arcgis/core/geometry/Point';
 import FeatureLayer from '@arcgis/core/layers/FeatureLayer';
 import { DataSelectionContext } from '../contexts/AppContext';
 
-import { useContext, useEffect, useRef } from 'react';
+import { useContext, useEffect, useRef, useState } from 'react';
 import Graphic from '@arcgis/core/Graphic';
 import config from '../config.json';
 import GraphicsLayer from '@arcgis/core/layers/GraphicsLayer';
@@ -19,6 +19,7 @@ import { ChartDataContext, MapViewContext } from '../contexts/AppContext';
 import * as geometryEngineAsync from '@arcgis/core/geometry/geometryEngineAsync';
 import { handleImageServiceRequest } from '../utils/utils';
 import { FPS, FRAME_DURATION, TOTAL_FRAMES } from '../utils/constants';
+import { Transition } from '@headlessui/react';
 
 const bufferSymbol = {
     type: 'simple-fill',
@@ -87,6 +88,10 @@ export default function Home() {
     const { mapView, setMapView } = useContext(MapViewContext);
     const { setChartData } = useContext(ChartDataContext);
     const { dataSelection } = useContext(DataSelectionContext);
+    const videosPaused = useRef(false);
+    const videosLoaded = useRef(false);
+
+    const [videosPausedState, setVideosPausedState] = useState(false);
 
     const mapDiv = useRef(null);
 
@@ -139,6 +144,8 @@ export default function Home() {
     useEffect(() => {
         if (mapView) return;
 
+        let loadedCount = 0;
+
         let layerList = [];
 
         const worldCountriesLayer = createFeatureLayer(
@@ -149,8 +156,11 @@ export default function Home() {
 
         config.datasets.forEach((dataset) => {
             dataset.variables.forEach((variable, index) => {
+                const timestamp = Date.now();
+                const videoUrl = `${variable.video}?cb=${timestamp}`;
+
                 const element = new VideoElement({
-                    video: variable.video,
+                    video: videoUrl,
                     georeference: new ExtentAndRotationGeoreference({
                         extent: new Extent({
                             xmin: -180,
@@ -179,31 +189,14 @@ export default function Home() {
                     const videoElement = element.content;
                     videoRefs.current[videoIndex] = videoElement;
 
+                    // Safari (macOS and iOS) has stricter media policies which might prevent the videos from loading automatically.
+                    // The load() method here forces Safari to load the video resources, so events like 'loadedmetadata' are fired.
+                    videoElement.load();
+
                     videoElement.addEventListener('loadedmetadata', () => {
-                        videoElement.currentTime = currentFrame / FPS;
-
-                        // I was getting "DOMException - The play() request was interrupted"
-                        // when trying to pause the video as a default. This is a workaround to avoid
-                        // the issue. See suggestions:
-                        // https://developers.google.com/web/updates/2017/06/play-request-was-interrupted
-                        const playPromise = videoElement.play();
-
-                        if (playPromise !== undefined) {
-                            playPromise
-                                .then(() => {
-                                    if (!videoElement.paused) {
-                                        console.log(
-                                            `Video ${videoIndex} is playing`
-                                        );
-                                        videoElement.pause();
-                                    }
-                                })
-                                .catch((error) => {
-                                    console.error(
-                                        `Error playing video ${videoIndex}:`,
-                                        error
-                                    );
-                                });
+                        loadedCount += 1;
+                        if (loadedCount === videoRefs.current.length) {
+                            videosLoaded.current = true;
                         }
                     });
 
@@ -236,6 +229,9 @@ export default function Home() {
                 altitude: {
                     min: 2000000
                 }
+            },
+            padding: {
+                bottom: 150
             }
         });
 
@@ -265,6 +261,16 @@ export default function Home() {
                     handleDragMove(event, view, bufferLayer, pointLayer);
                 } else if (event.action === 'end') {
                     handleDragEnd(view);
+                }
+            });
+
+            view.on('click', async (event) => {
+                const mapPoint = view.toMap(event);
+
+                if (mapPoint) {
+                    await createBuffer(mapPoint, pointLayer, bufferLayer);
+                    lastKnownPoint = mapPoint;
+                    await handleMapClick({ mapPoint });
                 }
             });
         });
@@ -304,6 +310,28 @@ export default function Home() {
     }
 
     useEffect(() => {
+        if (!videosLoaded.current) return;
+
+        videoRefs.current.forEach((videoElement) => {
+            if (videoElement) {
+                // Pause the video and reset its currentTime to 0 because we will scrub the video frames manually.
+                // We are not using the native video playback controls; instead, we'll control the video frame by frame.
+                videoElement.pause();
+                videoElement.currentTime = 0;
+            }
+        });
+
+        setCurrentFrame(0);
+        videosPaused.current = true;
+        setVideosPausedState(true);
+    }, [videosLoaded.current, videoRefs, setCurrentFrame]);
+
+    useEffect(() => {
+        if (!videosPaused.current || !isPlaying) {
+            console.log('Conditions not met to start scrubbing the video');
+            return;
+        }
+
         const totalFrames = TOTAL_FRAMES;
         const frameDuration = FRAME_DURATION;
         let lastFrameTime = 0;
@@ -354,10 +382,25 @@ export default function Home() {
         return () => {
             if (animationFrameId) cancelAnimationFrame(animationFrameId);
         };
-    }, [isPlaying, videoRefs, setCurrentFrame]);
+    }, [isPlaying, videosPausedState, videoRefs, setCurrentFrame]);
 
     return (
         <div>
+            <Transition
+                show={!videosLoaded.current}
+                enter="transition-opacity duration-300"
+                enterFrom="opacity-0"
+                enterTo="opacity-100"
+                leave="transition-opacity duration-300"
+                leaveFrom="opacity-100"
+                leaveTo="opacity-0"
+            >
+                <div className="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-85">
+                    <p className="text-white text-xl font-light tracking-wide leading-relaxed text-center max-w-xs sm:max-w-md">
+                        Preparing your journey, please wait...
+                    </p>
+                </div>
+            </Transition>
             <div className='map' ref={mapDiv} style={{ height: '100vh' }}></div>
         </div>
     );
