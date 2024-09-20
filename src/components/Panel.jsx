@@ -14,7 +14,11 @@ import {
     ForwardIcon
 } from '@heroicons/react/24/outline';
 import { Switch } from '@headlessui/react';
-import { FPS, MANUAL_FORWARD_BACKWARD_STEP_SIZE } from '../utils/constants';
+import {
+    FPS,
+    MANUAL_FORWARD_BACKWARD_STEP_SIZE,
+    TOTAL_FRAMES
+} from '../utils/constants';
 
 export default function Panel() {
     const {
@@ -34,10 +38,12 @@ export default function Panel() {
 
     const handlePlayPause = () => {
         if (isPlaying) {
+            videoRefs.current.forEach((video) => video.pause());
             setCurrentFrame(
                 videoRefs.current[selectedVariableIndex].currentTime * FPS
             );
         } else {
+            videoRefs.current.forEach((video) => video.play());
             videoRefs.current[selectedVariableIndex].currentTime =
                 currentFrame / FPS;
         }
@@ -46,32 +52,31 @@ export default function Panel() {
 
     // Forward 10 years (to be adjusted based on the final datasets)
     const handleForward = () => {
-        const video = videoRefs.current[selectedVariableIndex];
-        const totalFrames = video.duration * FPS;
-        const stepSize = MANUAL_FORWARD_BACKWARD_STEP_SIZE;
-
         const newFrame =
-            currentFrame + stepSize >= totalFrames
-                ? (currentFrame + stepSize) % totalFrames
-                : currentFrame + stepSize;
+            currentFrame + MANUAL_FORWARD_BACKWARD_STEP_SIZE >= TOTAL_FRAMES
+                ? (currentFrame + MANUAL_FORWARD_BACKWARD_STEP_SIZE) %
+                  TOTAL_FRAMES
+                : currentFrame + MANUAL_FORWARD_BACKWARD_STEP_SIZE;
 
         setCurrentFrame(newFrame);
-        video.currentTime = newFrame / FPS;
+        videoRefs.current.forEach(
+            (video) => (video.currentTime = newFrame / FPS)
+        );
     };
 
     // Backward 10 years (to be adjusted based on the final datasets)
     const handleBackward = () => {
         const video = videoRefs.current[selectedVariableIndex];
-        const totalFrames = video.duration * FPS;
-        const stepSize = MANUAL_FORWARD_BACKWARD_STEP_SIZE;
-
         const newFrame =
-            currentFrame - stepSize < 0
-                ? totalFrames + (currentFrame - stepSize)
-                : currentFrame - stepSize;
+            currentFrame - MANUAL_FORWARD_BACKWARD_STEP_SIZE < 0
+                ? TOTAL_FRAMES +
+                  (currentFrame - MANUAL_FORWARD_BACKWARD_STEP_SIZE)
+                : currentFrame - MANUAL_FORWARD_BACKWARD_STEP_SIZE;
 
         setCurrentFrame(newFrame);
-        video.currentTime = newFrame / FPS;
+        videoRefs.current.forEach(
+            (video) => (video.currentTime = newFrame / FPS)
+        );
     };
 
     const changeDataset = (datasetIndex) => {

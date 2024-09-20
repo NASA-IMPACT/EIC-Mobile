@@ -88,10 +88,8 @@ export default function Home() {
     const { mapView, setMapView } = useContext(MapViewContext);
     const { setChartData } = useContext(ChartDataContext);
     const { dataSelection } = useContext(DataSelectionContext);
-    const videosPaused = useRef(false);
-    const videosLoaded = useRef(false);
 
-    const [videosPausedState, setVideosPausedState] = useState(false);
+    const [showTransition, setShowTransition] = useState(true);
 
     const mapDiv = useRef(null);
 
@@ -144,8 +142,6 @@ export default function Home() {
     useEffect(() => {
         if (mapView) return;
 
-        let loadedCount = 0;
-
         let layerList = [];
 
         const worldCountriesLayer = createFeatureLayer(
@@ -188,18 +184,7 @@ export default function Home() {
                 element.when(() => {
                     const videoElement = element.content;
                     videoRefs.current[videoIndex] = videoElement;
-
-                    // Safari (macOS and iOS) has stricter media policies which might prevent the videos from loading automatically.
-                    // The load() method here forces Safari to load the video resources, so events like 'loadedmetadata' are fired.
-                    videoElement.load();
-
-                    videoElement.addEventListener('loadedmetadata', () => {
-                        loadedCount += 1;
-                        if (loadedCount === videoRefs.current.length) {
-                            videosLoaded.current = true;
-                        }
-                    });
-
+                    videoElement.currentTime = currentFrame;
                     videoIndex++;
                 });
             });
@@ -310,28 +295,14 @@ export default function Home() {
     }
 
     useEffect(() => {
-        if (!videosLoaded.current) return;
+        const timer = setTimeout(() => {
+            setShowTransition(false);
+        }, 3000);
 
-        videoRefs.current.forEach((videoElement) => {
-            if (videoElement) {
-                // Pause the video and reset its currentTime to 0 because we will scrub the video frames manually.
-                // We are not using the native video playback controls; instead, we'll control the video frame by frame.
-                videoElement.pause();
-                videoElement.currentTime = 0;
-            }
-        });
-
-        setCurrentFrame(0);
-        videosPaused.current = true;
-        setVideosPausedState(true);
-    }, [videosLoaded.current, videoRefs, setCurrentFrame]);
+        return () => clearTimeout(timer);
+    }, []);
 
     useEffect(() => {
-        if (!videosPaused.current || !isPlaying) {
-            console.log('Conditions not met to start scrubbing the video');
-            return;
-        }
-
         const totalFrames = TOTAL_FRAMES;
         const frameDuration = FRAME_DURATION;
         let lastFrameTime = 0;
@@ -382,12 +353,12 @@ export default function Home() {
         return () => {
             if (animationFrameId) cancelAnimationFrame(animationFrameId);
         };
-    }, [isPlaying, videosPausedState, videoRefs, setCurrentFrame]);
+    }, [isPlaying, videoRefs, setCurrentFrame]);
 
     return (
         <div>
             <Transition
-                show={!videosLoaded.current}
+                show={showTransition}
                 enter="transition-opacity duration-300"
                 enterFrom="opacity-0"
                 enterTo="opacity-100"
