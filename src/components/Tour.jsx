@@ -1,5 +1,4 @@
 import React, { useState, useContext, useEffect } from 'react';
-import { DataSelectionContext } from '../contexts/AppContext';
 import Joyride from 'react-joyride';
 import TourButton from './TourButton';
 import useLocalStorage from '../hooks/useLocalStorage';
@@ -8,31 +7,41 @@ export default function Tour() {
   const [tourComplete, setTourComplete] = useLocalStorage('tourComplete', false)
   const [helpers, setHelpers] = useState({})
   const [run, setRun] = useState(!tourComplete)
-  const { dataSelection } = useContext(DataSelectionContext)
 
   const steps = [
     {
       target: 'body',
-      title: 'Welcome to EIC Mobile!',
-      content: 'This tour will guide you through the app. You can skip this tour at any time.',
+      title: 'Welcome to <Application Name>!',
+      content: 'The <Application Name> application is an extension of the in-person Earth Information Center exhibit at the Smithsonian National Museum of Natural History. Use this tool to explore how different emissions scenarios predict future changes in temperature at any location in the world.',
       placement: 'center',
       disableBeacon: true,
     },
     {
       target: '.map',
-      content: 'Select a location on the map to view data.',
+      content: 'Tap anywhere on the map to view how temperatures are expected to change at that location',
       placement: 'top-start',
       disableBeacon: true,
     },
     {
+      target: '.esri-search__container',
+      content: 'Or search by location',
+      disableBeacon: true,
+    },
+    {
+      target: 'body',
+      content: 'Learn how different emissions scenarios affect our future climate',
+      placement: 'center',
+      disableBeacon: true,
+    },
+    {
       target: '.dataset-choice',
-      title: `Select a dataset to view`,
-      content: `${dataSelection?.[0]?.datasetName || ''}: ${dataSelection?.[1]?.name || ''} ${dataSelection?.[1]?.description || ''}`,
+      content: 'Select an emissions scenario',
+      placement: 'top',
       disableBeacon: true,
     },
     {
       target: '.chart',
-      content: 'View the data in the chart.',
+      content: 'View past and projected temperature changes from 1950-2100 based on the selected emissions scenario',
       disableBeacon: true,
     }
   ]
