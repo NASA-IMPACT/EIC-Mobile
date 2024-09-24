@@ -1,6 +1,7 @@
 import React, { useState, useContext, useEffect } from 'react';
 import Joyride from 'react-joyride';
 import TourButton from './TourButton';
+import TourTooltip from './TourTooltip';
 import useLocalStorage from '../hooks/useLocalStorage';
 
 export default function Tour() {
@@ -19,7 +20,7 @@ export default function Tour() {
     {
       target: '.map',
       content: 'Tap anywhere on the map to view how temperatures are expected to change at that location',
-      placement: 'top-start',
+      placement: 'bottom',
       disableBeacon: true,
     },
     {
@@ -65,10 +66,11 @@ export default function Tour() {
         callback={handleJoyrideCallback}
         continuous={true}
         showProgress={true}
-        showSkipButton={true}
+        showSkipButton={false}
         disableOverlay={true}
         getHelpers={handleGetHelpers}
         run={run}
+        tooltipComponent={TourTooltip}
       />
     </div>
   )
