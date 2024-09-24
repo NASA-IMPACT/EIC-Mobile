@@ -12,7 +12,7 @@ export default function Tour() {
     {
       target: 'body',
       title: 'Welcome to <Application Name>!',
-      content: 'The <Application Name> application is an extension of the in-person Earth Information Center exhibit at the Smithsonian National Museum of Natural History. Use this tool to explore how different emissions scenarios predict future changes in temperature at any location in the world.',
+      content: 'The <Application Name> application is an extension of the in-person Earth Information Center exhibit at the Smithsonian National Museum of Natural History. Use this tool to explore how climate change is expected to affect temperature at any location in the world.',
       placement: 'center',
       disableBeacon: true,
     },
@@ -28,14 +28,8 @@ export default function Tour() {
       disableBeacon: true,
     },
     {
-      target: 'body',
-      content: 'Learn how different emissions scenarios affect our future climate',
-      placement: 'center',
-      disableBeacon: true,
-    },
-    {
       target: '.dataset-choice',
-      content: 'Select an emissions scenario',
+      content: 'Select a greenhouse gas (GHG) emissions scenario and learn how they impact our future climate',
       placement: 'top',
       disableBeacon: true,
     },
