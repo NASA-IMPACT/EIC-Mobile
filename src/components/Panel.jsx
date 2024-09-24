@@ -139,7 +139,7 @@ export default function Panel() {
                 {/* Tabs Row */}
                 <div className="flex items-center rounded-t-sm mb-2 overflow-x-auto whitespace-nowrap">
                     {/* Dataset Tabs */}
-                    <div className="dataset-choice flex">
+                    <div className="flex">
                         {config.datasets.map((dataset, datasetIndex) => (
                             <button
                                 key={dataset.datasetName}
@@ -169,7 +169,7 @@ export default function Panel() {
                     <div className="h-6 border-l border-white mx-0 ml-8 mr-8"></div>
 
                     {/* Variable Tabs */}
-                    <div className="flex">
+                    <div className="dataset-choice flex">
                         {selectedDataset.variables.map(
                             (variable, variableIndex) => (
                                 <button
