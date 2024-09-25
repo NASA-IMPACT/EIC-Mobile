@@ -12,8 +12,8 @@ export default function Tour() {
   const steps = [
     {
       target: 'body',
-      title: 'Welcome to <Application Name>!',
-      content: 'The <Application Name> application is an extension of the in-person Earth Information Center exhibit at the Smithsonian National Museum of Natural History. Use this tool to explore how climate change is expected to affect temperature at any location in the world.',
+      title: 'Welcome to the Mobile Climate Mapper!',
+      content: 'The Mobile Climate Mapper is an extension of the in-person Earth Information Center exhibit at the Smithsonian National Museum of Natural History. Use this tool to explore how climate change is expected to affect temperature at any location in the world.',
       placement: 'center',
       disableBeacon: true,
     },
