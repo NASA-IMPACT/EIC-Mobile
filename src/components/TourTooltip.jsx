@@ -7,7 +7,7 @@ const TooltipContainer = styled.div`
   color: rgb(51, 51, 51);
   font-size: 16px;
   max-width: 100%;
-  padding: 10px;
+  padding: 15px;
   position: relative;
   width: 380px;
   box-shadow: 8px 8px 5px rgba(0, 32, 63, 0.35);
@@ -20,7 +20,7 @@ const TooltipClose = styled.button`
   cursor: pointer;
   font-size: 24px;
   line-height: 1;
-  padding: 10px;
+  padding: 15px;
   appearance: none;
   position: absolute;
   right: 0px;
@@ -28,7 +28,8 @@ const TooltipClose = styled.button`
 `
 
 const TooltipTitle = styled.h1`
-  font-size: 18px;
+  font-weight: bold;
+  font-size: 24px;
   margin: 0px;
 `
 
@@ -87,8 +88,9 @@ export default function CustomTooltip(props) {
       <TooltipClose className="tooltip__close" {...closeProps}>
         &times;
       </TooltipClose>
-      <div style={{ lineHeight: '1.4', textAlign: 'center' }}>
-        {step.title && <TooltipTitle className="tooltip__title">{step.title}</TooltipTitle>}
+      <div style={{ lineHeight: '1.4', textAlign: 'left' }}>
+        {step.title && <TooltipTitle className="tooltip__title">{`${step.title}`}</TooltipTitle>}
+        {step.name && <TooltipTitle className="tooltip__name">{`${step.name}`}</TooltipTitle>}
         <TooltipContent className="tooltip__content">{step.content}</TooltipContent>
       </div>
       <TooltipFooter className="tooltip__footer">
