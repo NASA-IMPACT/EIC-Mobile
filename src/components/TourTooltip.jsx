@@ -1,7 +1,5 @@
 import styled from 'styled-components';
 
-const PRIMARY_COLOR = '#3661e1'
-
 const TooltipContainer = styled.div` 
   background-color: rgb(255, 255, 255);
   border-radius: 5px;
@@ -9,7 +7,7 @@ const TooltipContainer = styled.div`
   color: rgb(51, 51, 51);
   font-size: 16px;
   max-width: 100%;
-  padding: 15px;
+  padding: 10px;
   position: relative;
   width: 380px;
   box-shadow: 8px 8px 5px rgba(0, 32, 63, 0.35);
@@ -22,7 +20,7 @@ const TooltipClose = styled.button`
   cursor: pointer;
   font-size: 24px;
   line-height: 1;
-  padding: 15px;
+  padding: 10px;
   appearance: none;
   position: absolute;
   right: 0px;
@@ -34,7 +32,8 @@ const TooltipTitle = styled.h1`
   margin: 0px;
 `
 
-const TooltipContent = styled.div`
+const TooltipContent = styled.p`
+  text-align: left;
   padding: 20px 10px;
 `
 
@@ -60,7 +59,7 @@ const BackButton = styled.button`
 `
 
 const PrimaryButton = styled.button`
-  background-color: ${PRIMARY_COLOR};
+  background-color: #3661e1;
   border: 0px;
   border-radius: 4px;
   color: rgb(255, 255, 255);
@@ -81,7 +80,7 @@ export default function CustomTooltip(props) {
     primaryProps,
     step,
     tooltipProps
-} = props;
+  } = props;
 
   return (
     <TooltipContainer className="tooltip__body" {...tooltipProps}>
@@ -101,7 +100,7 @@ export default function CustomTooltip(props) {
           )}
           {continuous && (
             <PrimaryButton className="tooltip__button tooltip__button--primary" {...primaryProps}>
-              {primaryProps.title}
+              {primaryProps.title === 'Last' ? 'End Tour' : primaryProps.title}
             </PrimaryButton>
           )}
         </div>
