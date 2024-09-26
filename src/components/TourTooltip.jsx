@@ -41,8 +41,9 @@ const TooltipContent = styled.p`
 const TooltipFooter = styled.div`
   align-items: center;
   display: flex;
-  justify-content: flex-end;
+  justify-content: space-between;
   margin-top: 15px;
+  width: 100%;
 `
 
 const BackButton = styled.button`
@@ -55,8 +56,6 @@ const BackButton = styled.button`
   line-height: 1;
   padding: 8px;
   appearance: none;
-  margin-left: auto;
-  margin-right: 5px;
 `
 
 const PrimaryButton = styled.button`
@@ -69,6 +68,12 @@ const PrimaryButton = styled.button`
   line-height: 1;
   padding: 8px;
   appearance: none;
+`
+
+const Spacer = styled.div`
+  width: 100%;
+  display: flex;
+  justify-content: flex-end;
 `
 
 
@@ -94,18 +99,18 @@ export default function CustomTooltip(props) {
         <TooltipContent className="tooltip__content">{step.content}</TooltipContent>
       </div>
       <TooltipFooter className="tooltip__footer">
-        <div className="tooltip__spacer">
-          {index > 0 && (
-            <BackButton className="tooltip__button" {...backProps}>
-              {backProps.title}
-            </BackButton>
-          )}
+        {index > 0 && (
+          <BackButton className="tooltip__button" {...backProps}>
+            {backProps.title}
+          </BackButton>
+        )}
+      <Spacer className="tooltip__spacer">
           {continuous && (
             <PrimaryButton className="tooltip__button tooltip__button--primary" {...primaryProps}>
               {primaryProps.title === 'Last' ? 'End Tour' : primaryProps.title}
             </PrimaryButton>
           )}
-        </div>
+        </Spacer>
       </TooltipFooter>
     </TooltipContainer>
   );
