@@ -31,9 +31,9 @@ export const handleImageServiceRequest = async (event, variable, setChartData) =
   };
 
   try {
-    const response = await fetch(url.toString(), { method: 'GET' });
-    const results = await response.json();
-    // const results = mockData;
+    // const response = await fetch(url.toString(), { method: 'GET' });
+    // const results = await response.json();
+    const results = mockData;
 
     let invalidData = false;
 

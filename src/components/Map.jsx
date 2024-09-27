@@ -218,6 +218,7 @@ export default function Home() {
                     variable.video
                 );
 
+                console.log('ovde ', videoRefs)
                 element.when(() => {
                     const videoElement = element.content;
                     videoRefs.current[videoIndex] = videoElement;
