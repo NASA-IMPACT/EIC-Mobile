@@ -1,35 +1,40 @@
 import { useState } from 'react';
-import config from './config.json';
 import Map from './components/Map';
 import Panel from './components/Panel';
 import EICLogo from './components/Logo';
-import { VitalsDataContext, MapViewContext, ChartDataContext, CurrentJSONContext, DataSelectionContext } from './contexts/AppContext';
+import {
+  MapViewContext,
+  ChartDataContext,
+  DataSelectionContext
+} from './contexts/AppContext';
 import { VideoProvider } from './contexts/VideoContext';
+import config from './config.json';
 
 export default function App() {
-  const [mapView, setMapView] = useState(null);
-  const [currentJSON, setCurrentJSON] = useState(config[0]);
-  const [chartData, setChartData] = useState([]);
-  const [ vitalsData, setVitalsData ] = useState({ globalAverage: 'N/A', globalMax: 'N/A' }, );
-  const [dataSelection, setDataSelection] = useState([false, 0]);
+    const defaultDataset = config.datasets[0];
+    const defaultVariable = defaultDataset.variables[0];
+    const [dataSelection, setDataSelection] = useState([
+        defaultDataset,
+        defaultVariable
+    ]);
+    const [mapView, setMapView] = useState(null);
+    const [chartData, setChartData] = useState([]);
 
-  return (
-    <MapViewContext.Provider value={{ mapView, setMapView }}>
-      <CurrentJSONContext.Provider value={{ currentJSON, setCurrentJSON }}>
-        <DataSelectionContext.Provider value={{ dataSelection, setDataSelection }}>
-          <VitalsDataContext.Provider value={{ vitalsData, setVitalsData }}>
-            <ChartDataContext.Provider value={{ chartData, setChartData }}>
-              <VideoProvider>
-                <EICLogo />
-                <Panel />
-                <Map />
-              </VideoProvider>
-            </ChartDataContext.Provider>
-          </VitalsDataContext.Provider>
-        </DataSelectionContext.Provider>
-      </CurrentJSONContext.Provider>
-    </MapViewContext.Provider>
-  );
+    return (
+        <MapViewContext.Provider value={{ mapView, setMapView }}>
+            <DataSelectionContext.Provider
+                value={{ dataSelection, setDataSelection }}
+            >
+                <VideoProvider>
+                    <ChartDataContext.Provider
+                        value={{ chartData, setChartData }}
+                    >
+                        <EICLogo />
+                        <Panel />
+                        <Map />
+                    </ChartDataContext.Provider>
+                </VideoProvider>
+            </DataSelectionContext.Provider>
+        </MapViewContext.Provider>
+    );
 }
-
-

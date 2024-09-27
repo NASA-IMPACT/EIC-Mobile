@@ -1,20 +1,25 @@
+
 @import 'https://js.arcgis.com/4.30/@arcgis/core/assets/esri/themes/dark/main.css';
 
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
 
-
-.esri-view {
-
-    @media screen and (max-width: 768px) {
-        height: calc(100vh - 200px)
-
-    }
+.esri-ui-top-left {
+    display: none;
 }
 
-.esri-sketch {
-    display: none;
+.esri-attribution {
+    position: fixed !important;
+    background: transparent;
+
+    @media screen and (max-width: 1024px) {
+        bottom: 381px !important;
+    }
+
+    @media screen and (max-width: 768px) {
+        bottom: 370px !important;
+    }
 }
 
 * {
