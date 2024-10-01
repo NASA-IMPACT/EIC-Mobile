@@ -5,38 +5,6 @@
             "datasetVariablesTagline": "GHG Emissions Scenario",
             "variables": [
                 {
-                    "name": "126 - Low",
-                    "description": "Carbon dioxide emissions decline to net zero around 2070, followed by varying levels of reductions in existing carbon dioxide in the atmosphere.",
-                    "variable": "tasmax_ssp126",
-                    "unit": "Heatmax",
-                    "video": "./tasmax_monthly_ssp126_max12_8192_1024x512.mp4",
-                    "mobileVideo": "./tasmax_monthly_ssp126_max12_8192_512x256.mp4",
-                    "fallbackImage": "./tasmax_monthly_ssp126_first_frame.png",
-                    "service":
-                    "https://gis.earthdata.nasa.gov/eic/rest/services/tasmax_yearly_median/ImageServer",
-                    "datetimeRange": ["1950-01-31T00:00:00Z", "2100-12-31T23:59:59Z"],
-                    "wcs": false,
-                    "active": true,
-                    "vitals": {
-                        "globalMin": 0,
-                        "globalMax": 0,
-                        "globalAverage": 0,
-                        "globalTrend": 0
-                    },
-                    "tour": [
-                        {
-                            "stop": 0,
-                            "location": {
-                                "latitude": 0,
-                                "longitude": 0,
-                                "zoom": 2,
-                                "delay": 10000
-                            },
-                            "text": "This tour demonstrates the global distribution of the Monthly Maximum Heat Index (Heatmax), highlighting the areas most affected by extreme heat."
-                        }
-                    ]
-                },
-                {
                     "name": "245 - Intermediate",
                     "description": "Carbon dioxide emissions remain around current levels until the middle of the 21st century.",
                     "unit": "Heatmax",
@@ -68,6 +36,39 @@
                         }
                     ]
                 },
+                {
+                    "name": "126 - Low",
+                    "description": "Carbon dioxide emissions decline to net zero around 2070, followed by varying levels of reductions in existing carbon dioxide in the atmosphere.",
+                    "variable": "tasmax_ssp126",
+                    "unit": "Heatmax",
+                    "video": "./tasmax_monthly_ssp126_max12_8192_1024x512.mp4",
+                    "mobileVideo": "./tasmax_monthly_ssp126_max12_8192_512x256.mp4",
+                    "fallbackImage": "./tasmax_monthly_ssp126_first_frame.png",
+                    "service":
+                    "https://gis.earthdata.nasa.gov/eic/rest/services/tasmax_yearly_median/ImageServer",
+                    "datetimeRange": ["1950-01-31T00:00:00Z", "2100-12-31T23:59:59Z"],
+                    "wcs": false,
+                    "active": true,
+                    "vitals": {
+                        "globalMin": 0,
+                        "globalMax": 0,
+                        "globalAverage": 0,
+                        "globalTrend": 0
+                    },
+                    "tour": [
+                        {
+                            "stop": 0,
+                            "location": {
+                                "latitude": 0,
+                                "longitude": 0,
+                                "zoom": 2,
+                                "delay": 10000
+                            },
+                            "text": "This tour demonstrates the global distribution of the Monthly Maximum Heat Index (Heatmax), highlighting the areas most affected by extreme heat."
+                        }
+                    ]
+                },
+
                 {
                     "name": "370 - High",
                     "description": "Carbon dioxide emissions roughly double from current levels by 2100.",
