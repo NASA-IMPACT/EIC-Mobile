@@ -68,12 +68,9 @@ export default function Panel() {
         setDataSelection([selectedDataset, selectedVariable]);
 
         mapView.map.layers.forEach((layer) => {
-            if (
-                layer.title === selectedVariable.name ||
-                layer.title === 'World Countries' ||
-                layer.title === 'Geodesic-Buffer' ||
-                layer.title === 'Geodesic-Point'
-            ) {
+            if (layer.type !== 'media') return;
+
+            if (layer.title.includes(selectedVariable.name)) {
                 layer.opacity = 1;
             } else {
                 layer.opacity = 0;

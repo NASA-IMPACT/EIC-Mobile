@@ -209,7 +209,7 @@ export default function Home() {
 
                 const fallbackImageUrl = variable.fallbackImage;
 
-                const element = new VideoElement({
+                const videoElement = new VideoElement({
                     video: videoUrl,
                     georeference: new ExtentAndRotationGeoreference({
                         extent: new Extent({
@@ -235,14 +235,21 @@ export default function Home() {
                     })
                 });
 
-                const mediaLayer = new MediaLayer({
-                    source: [imageElement, element],
-                    title: variable.name,
-                    zIndex: index,
+                const imageMediaLayer = new MediaLayer({
+                    source: [imageElement],
+                    title: `${variable.name}_image`,
+                    zIndex: index * 2,
                     opacity: variable.name === '245 - Intermediate' ? 1 : 0
                 });
 
-                layerList.push(mediaLayer);
+                const videoMediaLayer = new MediaLayer({
+                    source: [videoElement],
+                    title: `${variable.name}_video`,
+                    zIndex: index * 2 + 1,
+                    opacity: variable.name === '245 - Intermediate' ? 1 : 0
+                });
+
+                layerList.push(imageMediaLayer, videoMediaLayer);
 
                 console.log(
                     `Initializing video for: ${import.meta.env.BASE_URL}${
@@ -251,10 +258,9 @@ export default function Home() {
                     variable.video
                 );
 
-                element
-                    .when((status) => {
-                        const videoElement = element.content;
-                        videoRefs.current[videoIndex] = videoElement;
+                videoElement
+                    .when(() => {
+                        videoRefs.current[index] = videoElement.content;
                         loadedVideos++;
                         console.log(
                             `Video initialized for: ${variable.name}`,
@@ -573,7 +579,7 @@ export default function Home() {
     return (
         <div>
             <Transition
-                show={showTransition}
+                show={!allVideosLoaded}
                 enter="transition-opacity duration-300"
                 enterFrom="opacity-0"
                 enterTo="opacity-100"
