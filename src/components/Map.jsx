@@ -32,6 +32,7 @@ import {
     crosshairSymbol,
     createCornerAngles
 } from '../utils/sceneHelpers';
+import GeoJSONLayer from '@arcgis/core/layers/GeoJSONLayer';
 
 import ShareModal from './ShareModal';
 
@@ -81,9 +82,34 @@ export default function Home() {
 
     let draggingInsideBuffer = false;
     let initialCamera;
-    let lastKnownPoint;
+    let lastKnownPoint = new Point({
+        longitude: -77.0369,
+        latitude: 38.9072,
+        spatialReference: { wkid: 4326 }
+    });
     let bufferLayer;
     let pointLayer;
+
+    const addGeoJsonLayer = (map) => {
+        const geojsonLayer = new GeoJSONLayer({
+            url: '/grid_lines.geojson',
+            title: 'Local GeoJSON Layer',
+            zIndex: 999,
+            renderer: {
+                type: 'simple',
+                symbol: {
+                    type: 'simple-line',
+                    color: [128, 128, 128, 0.25],
+                    width: 1
+                }
+            },
+            interactive: false,
+            popupEnabled: false
+        });
+
+        map.add(geojsonLayer);
+        console.log('GeoJSON Layer added', geojsonLayer);
+    };
 
     const initializeLayers = (map) => {
         pointLayer = new GraphicsLayer({ title: 'Geodesic-Point' });
@@ -93,24 +119,50 @@ export default function Home() {
         return { bufferLayer, pointLayer };
     };
 
-    const createBuffer = async (point, pointLayer, bufferLayer) => {
-        const sideLength = 10;
+    const createBuffer = async (point, pointLayer, bufferLayer, view) => {
+        const zoomLevel = view.zoom;
+        const baseSideLength = 10;
+        const sideLength = baseSideLength / (zoomLevel * 0.5);
+
+        const snappedLongitude = snapToGridCenter(point.longitude);
+        const snappedLatitude = snapToGridCenter(point.latitude);
+
+        const snappedPoint = new Point({
+            longitude: snappedLongitude,
+            latitude: snappedLatitude,
+            spatialReference: point.spatialReference
+        });
 
         const squarePolygon = {
             type: 'polygon',
             rings: [
                 [
-                    [point.x - sideLength / 2, point.y - sideLength / 2],
-                    [point.x + sideLength / 2, point.y - sideLength / 2],
-                    [point.x + sideLength / 2, point.y + sideLength / 2],
-                    [point.x - sideLength / 2, point.y + sideLength / 2],
-                    [point.x - sideLength / 2, point.y - sideLength / 2]
+                    [
+                        snappedPoint.x - sideLength / 2,
+                        snappedPoint.y - sideLength / 2
+                    ],
+                    [
+                        snappedPoint.x + sideLength / 2,
+                        snappedPoint.y - sideLength / 2
+                    ],
+                    [
+                        snappedPoint.x + sideLength / 2,
+                        snappedPoint.y + sideLength / 2
+                    ],
+                    [
+                        snappedPoint.x - sideLength / 2,
+                        snappedPoint.y + sideLength / 2
+                    ],
+                    [
+                        snappedPoint.x - sideLength / 2,
+                        snappedPoint.y - sideLength / 2
+                    ]
                 ]
             ],
-            spatialReference: point.spatialReference
+            spatialReference: snappedPoint.spatialReference
         };
 
-        const cornerAngles = createCornerAngles(point, sideLength);
+        const cornerAngles = createCornerAngles(snappedPoint, sideLength);
 
         const angleSymbol = {
             type: 'simple-line',
@@ -123,37 +175,29 @@ export default function Home() {
             symbol: bufferSymbol
         });
 
-        if (!pointLayer.graphics.length) {
-            pointLayer.add(
-                new Graphic({ geometry: point, symbol: crosshairSymbol })
+        bufferLayer.removeAll();
+        bufferLayer.add(bufferGraphic);
+
+        cornerAngles.forEach((cornerGeometry) => {
+            bufferLayer.add(
+                new Graphic({
+                    geometry: cornerGeometry,
+                    symbol: angleSymbol
+                })
             );
-            bufferLayer.add(bufferGraphic);
+        });
 
-            cornerAngles.forEach((cornerGeometry) => {
-                bufferLayer.add(
-                    new Graphic({
-                        geometry: cornerGeometry,
-                        symbol: angleSymbol
-                    })
-                );
+        if (!pointLayer.graphics.length) {
+            const crosshairGraphic = new Graphic({
+                geometry: snappedPoint,
+                symbol: crosshairSymbol
             });
+            pointLayer.add(crosshairGraphic);
         } else {
-            pointLayer.graphics.getItemAt(0).geometry = point;
-
-            bufferLayer.graphics.getItemAt(0).geometry = squarePolygon;
-            bufferLayer.graphics.getItemAt(0).symbol = bufferSymbol;
-
-            bufferLayer.removeAll();
-            bufferLayer.add(bufferGraphic);
-            cornerAngles.forEach((cornerGeometry) => {
-                bufferLayer.add(
-                    new Graphic({
-                        geometry: cornerGeometry,
-                        symbol: angleSymbol
-                    })
-                );
-            });
+            pointLayer.graphics.getItemAt(0).geometry = snappedPoint;
         }
+
+        return snappedPoint;
     };
 
     const handleDragStart = async (event, view, bufferLayer) => {
@@ -180,10 +224,15 @@ export default function Home() {
 
             if (updatedPoint) {
                 event.stopPropagation();
-                await createBuffer(updatedPoint, pointLayer, bufferLayer);
+                await createBuffer(updatedPoint, pointLayer, bufferLayer, view);
                 lastKnownPoint = updatedPoint;
             }
         }
+    };
+
+    const snapToGridCenter = (value, interval = 0.25) => {
+        const rounded = Math.floor(value / interval) * interval;
+        return rounded + interval / 2;
     };
 
     const handleDragEnd = async (view) => {
@@ -313,7 +362,7 @@ export default function Home() {
             constraints: {
                 snapToZoom: false,
                 altitude: {
-                    min: 2000000
+                    min: 1000000
                 }
             },
             padding: {
@@ -324,6 +373,8 @@ export default function Home() {
         view.ui.add('attribution', {
             position: 'bottom-right'
         });
+
+        addGeoJsonLayer(map);
 
         const { bufferLayer, pointLayer } = initializeLayers(map);
 
@@ -341,7 +392,14 @@ export default function Home() {
                 ],
                 zoom: 1
             });
-            await createBuffer(initialCenterPoint, pointLayer, bufferLayer);
+
+            await createBuffer(
+                initialCenterPoint,
+                pointLayer,
+                bufferLayer,
+                view
+            );
+
             await handleMapClick({ mapPoint: initialCenterPoint });
 
             view.on('drag', (event) => {
@@ -358,9 +416,16 @@ export default function Home() {
                 const mapPoint = view.toMap(event);
 
                 if (mapPoint) {
-                    await createBuffer(mapPoint, pointLayer, bufferLayer);
+                    await createBuffer(mapPoint, pointLayer, bufferLayer, view);
                     lastKnownPoint = mapPoint;
                     await handleMapClick({ mapPoint }, view);
+                }
+            });
+
+            view.watch('zoom', () => {
+                console.log('Zoom changed');
+                if (lastKnownPoint) {
+                    createBuffer(lastKnownPoint, pointLayer, bufferLayer, view);
                 }
             });
         }).catch((error) => {
@@ -419,7 +484,7 @@ export default function Home() {
 
                 view.graphics.removeAll();
 
-                await createBuffer(point, pointLayer, bufferLayer);
+                await createBuffer(point, pointLayer, bufferLayer, view);
                 lastKnownPoint = point;
 
                 await handleMapClick({ mapPoint: point }, view);
@@ -481,7 +546,12 @@ export default function Home() {
                     zoom: 10
                 });
 
-                await createBuffer(defaultScenePoint, pointLayer, bufferLayer);
+                await createBuffer(
+                    defaultScenePoint,
+                    pointLayer,
+                    bufferLayer,
+                    view
+                );
 
                 const eventForDC = { mapPoint: defaultScenePoint };
                 const dataIsValidDC = await handleImageServiceRequest(

@@ -1,6 +1,6 @@
 export const bufferSymbol = {
     type: 'simple-fill',
-    color: [5, 80, 216, 0.5],
+    color: [5, 80, 216, 0.2],
     outline: { color: [255, 255, 255, 0], width: 0 }
 };
 
