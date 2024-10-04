@@ -32,8 +32,17 @@ export const handleImageServiceRequest = async (event, variable, setChartData, s
     }),
   };
 
+  const token = process.env.GIS_TOKEN;
+
   try {
-    const response = await fetch(url.toString(), { method: 'GET' });
+    const response = await fetch(url.toString(), {
+      method: 'GET',
+      headers: {
+        'Authorization': `Bearer ${token}`,
+        'Referer': 'https://earthdata.gov',
+      }
+    });
+
     const results = await response.json();
     // const results = mockData; // Uncomment this line to use mockData during testing
 
