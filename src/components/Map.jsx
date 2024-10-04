@@ -398,12 +398,14 @@ export default function Home() {
 
             view.watch('zoom', () => {
                 if (lastKnownPoint) {
-                    debouncedCreateBuffer(
-                        lastKnownPoint,
-                        pointLayer,
-                        bufferLayer,
-                        view
-                    );
+                    setTimeout(() => {
+                        debouncedCreateBuffer(
+                            lastKnownPoint,
+                            pointLayer,
+                            bufferLayer,
+                            view
+                        );
+                    }, 100);
                 }
             });
         }).catch((error) => {
