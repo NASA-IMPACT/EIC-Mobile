@@ -1,11 +1,12 @@
 import LineChart from './LineChart';
-import { useContext, useState, useMemo } from 'react';
+import { useContext, useState, useMemo, useEffect } from 'react';
 import config from '../config.json';
 import {
     DataSelectionContext,
     MapViewContext,
     ChartDataContext
 } from '../contexts/AppContext';
+import { DataFetchingContext } from '../contexts/DataFetchingContext';
 import { VideoContext } from '../contexts/VideoContext';
 import { PlayIcon, PauseIcon } from '@heroicons/react/24/solid';
 import { FPS, TOTAL_FRAMES } from '../utils/constants';
@@ -26,6 +27,9 @@ export default function Panel() {
     } = useContext(VideoContext);
     const { mapView } = useContext(MapViewContext);
     const { setDataSelection } = useContext(DataSelectionContext);
+    const { isLoading, isInvalidData } = useContext(DataFetchingContext);
+    const [wasInvalidShown, setWasInvalidShown] = useState(false);
+
     const [isFahrenheit, setIsFahrenheit] = useState(true);
     const { chartData } = useContext(ChartDataContext);
 
@@ -70,7 +74,13 @@ export default function Panel() {
         mapView.map.layers.forEach((layer) => {
             if (layer.type !== 'media') return;
 
-            if (layer.title.includes(selectedVariable.name)) {
+            const variableName = selectedVariable.name;
+            const validTitles = [
+                `${variableName}_image`,
+                `${variableName}_video`
+            ];
+
+            if (validTitles.includes(layer.title)) {
                 layer.opacity = 1;
             } else {
                 layer.opacity = 0;
@@ -110,6 +120,16 @@ export default function Panel() {
             (video) => (video.currentTime = frameForYear / FPS)
         );
     };
+
+    useEffect(() => {
+        if (isInvalidData) {
+            setWasInvalidShown(true);
+        } else {
+            // Reset wasInvalidShown after a short delay or when the invalid message is gone
+            const timer = setTimeout(() => setWasInvalidShown(false), 2000); // 2-second delay
+            return () => clearTimeout(timer); // Cleanup the timer on component unmount or update
+        }
+    }, [isInvalidData]);
 
     return (
         <>
@@ -209,85 +229,122 @@ export default function Panel() {
                                     className="flex-1"
                                     style={{ minWidth: '600px' }}
                                 >
-                                    <div
-                                        className="flex justify-between mb-2"
-                                        style={{ width: '100%' }}
-                                    >
-                                        {getMaxValuesForYears.map(
-                                            (item, idx) => (
-                                                <div
-                                                    key={idx}
-                                                    className="relative text-center"
-                                                >
-                                                    {item.value === 'N/A' ? (
-                                                        <div className="bg-blue-600 bg-opacity-90 rounded"></div>
-                                                    ) : (
-                                                        <div
-                                                            className="flex flex-col items-center justify-center cursor-pointer"
-                                                            onClick={() =>
-                                                                handleYearClick(
-                                                                    item.year
-                                                                )
-                                                            }
-                                                        >
-                                                            <div
-                                                                className="flex items-baseline py-1 px-2 rounded-md"
-                                                                style={{
-                                                                    backgroundColor:
-                                                                        getTemperatureColor(
-                                                                            item.value,
-                                                                            isFahrenheit
-                                                                                ? 'F'
-                                                                                : 'C'
-                                                                        ),
-                                                                    color: getTextColor(
-                                                                        getTemperatureColor(
-                                                                            item.value,
-                                                                            isFahrenheit
-                                                                                ? 'F'
-                                                                                : 'C'
-                                                                        )
-                                                                    )
-                                                                }}
-                                                            >
-                                                                <span className="text-xl font-bold">
-                                                                    {item.value}
-                                                                </span>
-                                                                <span
-                                                                    style={{
-                                                                        fontSize:
-                                                                            '0.5em',
-                                                                        marginLeft:
-                                                                            '2px'
-                                                                    }}
-                                                                >
-                                                                    °
-                                                                    {isFahrenheit
-                                                                        ? 'F'
-                                                                        : 'C'}
-                                                                </span>
-                                                            </div>
-                                                            <span className="text-white text-xs mt-1">
-                                                                {item.year}
-                                                            </span>
-                                                        </div>
-                                                    )}
-                                                </div>
-                                            )
+                                    {/* Show fetching message only if loading, not showing invalid message, and if the invalid message wasn't recently shown */}
+                                    {isLoading &&
+                                        !isInvalidData &&
+                                        !wasInvalidShown && (
+                                            <div className="absolute inset-0 flex flex-col items-center justify-center text-white h-full px-4 lg:max-w-2xl lg:mx-auto">
+                                                <div className="w-12 h-12 border-4 border-t-transparent border-[#14367D] rounded-full animate-spin mb-4"></div>
+                                                <p className="text-white font-bold text-sm lg:text-lg leading-[20px] lg:leading-[24px] text-center">
+                                                    Fetching temperature
+                                                    information for your
+                                                    selected location...
+                                                </p>
+                                            </div>
                                         )}
-                                    </div>
 
-                                    <div
-                                        className="w-full"
-                                        style={{ minWidth: '600px' }}
-                                    >
-                                        <LineChart
-                                            selectedIndex={
-                                                selectedVariableIndex
-                                            }
-                                            isFahrenheit={isFahrenheit}
-                                        />
-                                    </div>
+                                    {/* Show invalid data message if data is invalid */}
+                                    {isInvalidData && (
+                                        <div className="absolute inset-0 flex flex-col items-center justify-center text-white h-full px-4 lg:max-w-2xl lg:mx-auto">
+                                            <div className="w-12 h-12 border-4 border-t-transparent border-[#14367D] rounded-full animate-spin mb-4"></div>
+                                            <p className="text-white font-bold text-sm lg:text-lg leading-[20px] lg:leading-[24px] text-center">
+                                                This dataset does not provide
+                                                temperature information for
+                                                oceans. Moving the map marker to
+                                                the default location...
+                                            </p>
+                                        </div>
+                                    )}
+
+                                    {/* Loading or Invalid data message handling */}
+                                    {!isLoading && !isInvalidData && (
+                                        <>
+                                            <div
+                                                className="flex justify-between mb-2"
+                                                style={{ width: '100%' }}
+                                            >
+                                                {getMaxValuesForYears.map(
+                                                    (item, idx) => (
+                                                        <div
+                                                            key={idx}
+                                                            className="relative text-center"
+                                                        >
+                                                            {item.value ===
+                                                            'N/A' ? (
+                                                                <div className="bg-blue-600 bg-opacity-90 rounded"></div>
+                                                            ) : (
+                                                                <div
+                                                                    className="flex flex-col items-center justify-center cursor-pointer"
+                                                                    onClick={() =>
+                                                                        handleYearClick(
+                                                                            item.year
+                                                                        )
+                                                                    }
+                                                                >
+                                                                    <div
+                                                                        className="flex items-baseline py-1 px-2 rounded-md"
+                                                                        style={{
+                                                                            backgroundColor:
+                                                                                getTemperatureColor(
+                                                                                    item.value,
+                                                                                    isFahrenheit
+                                                                                        ? 'F'
+                                                                                        : 'C'
+                                                                                ),
+                                                                            color: getTextColor(
+                                                                                getTemperatureColor(
+                                                                                    item.value,
+                                                                                    isFahrenheit
+                                                                                        ? 'F'
+                                                                                        : 'C'
+                                                                                )
+                                                                            )
+                                                                        }}
+                                                                    >
+                                                                        <span className="text-xl font-bold">
+                                                                            {
+                                                                                item.value
+                                                                            }
+                                                                        </span>
+                                                                        <span
+                                                                            style={{
+                                                                                fontSize:
+                                                                                    '0.5em',
+                                                                                marginLeft:
+                                                                                    '2px'
+                                                                            }}
+                                                                        >
+                                                                            °
+                                                                            {isFahrenheit
+                                                                                ? 'F'
+                                                                                : 'C'}
+                                                                        </span>
+                                                                    </div>
+                                                                    <span className="text-white text-xs mt-1">
+                                                                        {
+                                                                            item.year
+                                                                        }
+                                                                    </span>
+                                                                </div>
+                                                            )}
+                                                        </div>
+                                                    )
+                                                )}
+                                            </div>
+
+                                            <div
+                                                className="w-full"
+                                                style={{ minWidth: '600px' }}
+                                            >
+                                                <LineChart
+                                                    selectedIndex={
+                                                        selectedVariableIndex
+                                                    }
+                                                    isFahrenheit={isFahrenheit}
+                                                />
+                                            </div>
+                                        </>
+                                    )}
                                 </div>
                             </div>
                         </div>

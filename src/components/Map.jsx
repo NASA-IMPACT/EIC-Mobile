@@ -16,6 +16,7 @@ import SceneView from '@arcgis/core/views/SceneView';
 import Search from '@arcgis/core/widgets/Search';
 import Popup from '@arcgis/core/widgets/Popup';
 import { VideoContext } from '../contexts/VideoContext';
+import { DataFetchingContext } from '../contexts/DataFetchingContext';
 import {
     ChartDataContext,
     MapViewContext,
@@ -27,13 +28,16 @@ import { FRAME_DURATION, TOTAL_FRAMES, FPS } from '../utils/constants';
 import { Transition } from '@headlessui/react';
 import Expand from '@arcgis/core/widgets/Expand';
 import { isMobileDevice } from '../utils/helpers';
-import {
-    bufferSymbol,
-    crosshairSymbol,
-    createCornerAngles
-} from '../utils/sceneHelpers';
+import { crosshairSymbol, bufferSymbol } from '../utils/sceneHelpers';
+import { debounce } from 'lodash';
 
 import ShareModal from './ShareModal';
+
+const defaultScenePoint = new Point({
+    longitude: -77.0369,
+    latitude: 38.9072,
+    spatialReference: { wkid: 4326 }
+});
 
 const createFeatureLayer = (url) =>
     new FeatureLayer({
@@ -59,6 +63,8 @@ export default function Home() {
     const { mapView, setMapView } = useContext(MapViewContext);
     const { setChartData } = useContext(ChartDataContext);
     const { dataSelection } = useContext(DataSelectionContext);
+    const { setIsLoading, setIsInvalidData } = useContext(DataFetchingContext);
+
     const [selectedDataset, selectedVariable] = dataSelection;
 
     const selectedDatasetVariables = config.datasets[0].variables;
@@ -73,6 +79,7 @@ export default function Home() {
 
     const mapDiv = useRef(null);
     const blurOverlayRef = useRef(null);
+    const searchExpandRef = useRef(null);
 
     const [allVideosLoaded, setAllVideosLoaded] = useState(false);
     let totalVideos = 4;
@@ -80,7 +87,7 @@ export default function Home() {
 
     let draggingInsideBuffer = false;
     let initialCamera;
-    let lastKnownPoint;
+    let lastKnownPoint = defaultScenePoint;
     let bufferLayer;
     let pointLayer;
 
@@ -92,9 +99,22 @@ export default function Home() {
         return { bufferLayer, pointLayer };
     };
 
-    const createBuffer = async (point, pointLayer, bufferLayer) => {
-        const sideLength = 10;
+    const createBuffer = async (point, pointLayer, bufferLayer, view) => {
+        const zoomLevel = view.zoom;
 
+        const baseMiddleRadius = 300;
+
+        const scaleFactor = zoomLevel / 3;
+
+        const middleRadius = baseMiddleRadius / scaleFactor;
+
+        const middleBufferSymbol = {
+            type: 'simple-fill',
+            color: [150, 50, 0, 0.0],
+            outline: { color: [255, 255, 255, 1], width: 2,  style:"dash"}
+        };
+
+        const sideLength = 0.25*scaleFactor;
         const squarePolygon = {
             type: 'polygon',
             rings: [
@@ -109,51 +129,42 @@ export default function Home() {
             spatialReference: point.spatialReference
         };
 
-        const cornerAngles = createCornerAngles(point, sideLength);
-
-        const angleSymbol = {
-            type: 'simple-line',
-            color: [255, 255, 255],
-            width: 1
-        };
-
         const bufferGraphic = new Graphic({
             geometry: squarePolygon,
             symbol: bufferSymbol
         });
 
-        if (!pointLayer.graphics.length) {
-            pointLayer.add(
-                new Graphic({ geometry: point, symbol: crosshairSymbol })
-            );
-            bufferLayer.add(bufferGraphic);
 
-            cornerAngles.forEach((cornerGeometry) => {
-                bufferLayer.add(
-                    new Graphic({
-                        geometry: cornerGeometry,
-                        symbol: angleSymbol
-                    })
-                );
-            });
+        const middleCircle = await geometryEngineAsync.geodesicBuffer(
+            point,
+            middleRadius,
+            'kilometers'
+        );
+
+        const middleBufferGraphic = new Graphic({
+            geometry: middleCircle,
+            symbol: middleBufferSymbol
+        });
+
+        const crosshairGraphic = new Graphic({
+            geometry: point,
+            symbol: crosshairSymbol
+        });
+
+        if (!pointLayer.graphics.length) {
+            pointLayer.add(crosshairGraphic);
+            bufferLayer.add(middleBufferGraphic);
+            bufferLayer.add(bufferGraphic);
         } else {
             pointLayer.graphics.getItemAt(0).geometry = point;
-
-            bufferLayer.graphics.getItemAt(0).geometry = squarePolygon;
-            bufferLayer.graphics.getItemAt(0).symbol = bufferSymbol;
-
-            bufferLayer.removeAll();
-            bufferLayer.add(bufferGraphic);
-            cornerAngles.forEach((cornerGeometry) => {
-                bufferLayer.add(
-                    new Graphic({
-                        geometry: cornerGeometry,
-                        symbol: angleSymbol
-                    })
-                );
-            });
+            bufferLayer.graphics.getItemAt(0).geometry = middleCircle;
+            bufferLayer.graphics.getItemAt(0).symbol = middleBufferSymbol;
+            bufferLayer.graphics.getItemAt(1).geometry = squarePolygon;
+            bufferLayer.graphics.getItemAt(1).symbol = bufferSymbol;
         }
     };
+
+    const debouncedCreateBuffer = debounce(createBuffer, 100);
 
     const handleDragStart = async (event, view, bufferLayer) => {
         const startPoint = view.toMap({ x: event.x, y: event.y });
@@ -179,7 +190,7 @@ export default function Home() {
 
             if (updatedPoint) {
                 event.stopPropagation();
-                await createBuffer(updatedPoint, pointLayer, bufferLayer);
+                await createBuffer(updatedPoint, pointLayer, bufferLayer, view);
                 lastKnownPoint = updatedPoint;
             }
         }
@@ -246,14 +257,14 @@ export default function Home() {
                     source: [imageElement],
                     title: `${variable.name}_image`,
                     zIndex: index * 2,
-                    opacity: variable.name === '245 - Intermediate' ? 1 : 0
+                    opacity: variable.name === 'Intermediate' ? 1 : 0
                 });
 
                 const videoMediaLayer = new MediaLayer({
                     source: [videoElement],
                     title: `${variable.name}_video`,
                     zIndex: index * 2 + 1,
-                    opacity: variable.name === '245 - Intermediate' ? 1 : 0
+                    opacity: variable.name === 'Intermediate' ? 1 : 0
                 });
 
                 layerList.push(imageMediaLayer, videoMediaLayer);
@@ -278,7 +289,6 @@ export default function Home() {
                         videoElement.currentTime = currentFrame;
                         videoIndex++;
 
-                        console.log(loadedVideos, totalVideos);
                         if (loadedVideos === totalVideos) {
                             setAllVideosLoaded(true);
                         }
@@ -341,7 +351,12 @@ export default function Home() {
                 ],
                 zoom: 1
             });
-            await createBuffer(initialCenterPoint, pointLayer, bufferLayer);
+            await createBuffer(
+                initialCenterPoint,
+                pointLayer,
+                bufferLayer,
+                view
+            );
             await handleMapClick({ mapPoint: initialCenterPoint });
 
             view.on('drag', (event) => {
@@ -358,9 +373,20 @@ export default function Home() {
                 const mapPoint = view.toMap(event);
 
                 if (mapPoint) {
-                    await createBuffer(mapPoint, pointLayer, bufferLayer);
+                    await createBuffer(mapPoint, pointLayer, bufferLayer, view);
                     lastKnownPoint = mapPoint;
                     await handleMapClick({ mapPoint }, view);
+                }
+            });
+
+            view.watch('zoom', () => {
+                if (lastKnownPoint) {
+                    debouncedCreateBuffer(
+                        lastKnownPoint,
+                        pointLayer,
+                        bufferLayer,
+                        view
+                    );
                 }
             });
         }).catch((error) => {
@@ -380,25 +406,32 @@ export default function Home() {
             mode: 'floating'
         });
 
+        searchExpandRef.current = searchExpand;
         view.ui.add(searchExpand, 'top-right');
 
+        // Toggle blur state when searchExpand is expanded or collapsed
         searchExpand.watch('expanded', (isExpanded) => {
             const blurOverlay = blurOverlayRef.current;
 
-            if (isExpanded && blurOverlay) {
+            if (!blurOverlay) return;
+
+            if (isExpanded) {
                 setIsBlurActive(true);
                 blurOverlay.classList.add('active');
-            } else if (blurOverlay) {
+            } else {
                 setIsBlurActive(false);
                 blurOverlay.classList.remove('active');
             }
         });
 
-        if (blurOverlayRef.current) {
-            blurOverlayRef.current.addEventListener('click', () => {
-                searchExpand.collapse();
-            });
-        }
+        // Reset blur state when a search starts
+        searchWidget.on('search-start', () => {
+            const blurOverlay = blurOverlayRef.current;
+            if (blurOverlay) {
+                setIsBlurActive(false);
+                blurOverlay.classList.remove('active');
+            }
+        });
 
         searchWidget.on('select-result', async (event) => {
             const result = event.result;
@@ -412,7 +445,7 @@ export default function Home() {
 
                 view.graphics.removeAll();
 
-                await createBuffer(point, pointLayer, bufferLayer);
+                await createBuffer(point, pointLayer, bufferLayer, view);
                 lastKnownPoint = point;
 
                 await handleMapClick({ mapPoint: point }, view);
@@ -446,51 +479,63 @@ export default function Home() {
     const handleMapClick = async (event, view) => {
         const [_, selectedVariable] = dataSelection;
 
+        // round event latitude and longitude to the nearest quarter
+        //  degree to snap to grid
+        event.mapPoint.latitude = Math.round(event.mapPoint.latitude * 4) / 4;
+        event.mapPoint.longitude = Math.round(event.mapPoint.longitude * 4) / 4;
+
         const dataIsValid = await handleImageServiceRequest(
             event,
             selectedVariable,
-            setChartData
+            setChartData,
+            setIsLoading,
+            setIsInvalidData
         );
 
         if (!dataIsValid) {
-            const defaultScenePoint = new Point({
-                longitude: -77.0369,
-                latitude: 38.9072,
-                spatialReference: { wkid: 4326 }
-            });
+            lastKnownPoint = defaultScenePoint;
 
-            if (
-                Math.abs(
-                    event.mapPoint.longitude - defaultScenePoint.longitude
-                ) > 0.0001 ||
-                Math.abs(event.mapPoint.latitude - defaultScenePoint.latitude) >
-                    0.0001
-            ) {
-                await view.goTo({
-                    center: [
-                        defaultScenePoint.longitude,
-                        defaultScenePoint.latitude
-                    ],
-                    zoom: 10
-                });
+            setTimeout(async () => {
+                if (
+                    Math.abs(
+                        event.mapPoint.longitude - defaultScenePoint.longitude
+                    ) > 0.0001 ||
+                    Math.abs(
+                        event.mapPoint.latitude - defaultScenePoint.latitude
+                    ) > 0.0001
+                ) {
+                    await view.goTo({
+                        center: [
+                            defaultScenePoint.longitude,
+                            defaultScenePoint.latitude
+                        ],
+                        zoom: 10
+                    });
 
-                await createBuffer(defaultScenePoint, pointLayer, bufferLayer);
+                    await createBuffer(
+                        defaultScenePoint,
+                        pointLayer,
+                        bufferLayer,
+                        view
+                    );
 
-                const eventForDC = { mapPoint: defaultScenePoint };
-                const dataIsValidDC = await handleImageServiceRequest(
-                    eventForDC,
-                    selectedVariable,
-                    setChartData
-                );
+                    const eventForDC = { mapPoint: defaultScenePoint };
+                    const dataIsValidDC = await handleImageServiceRequest(
+                        eventForDC,
+                        selectedVariable,
+                        setChartData,
+                        setIsLoading,
+                        setIsInvalidData
+                    );
 
-                if (!dataIsValidDC) {
+                    if (!dataIsValidDC) {
+                        console.error('Data is invalid even for Washington DC');
+                    }
+                } else {
                     console.error('Data is invalid even for Washington DC');
                     setChartData([]);
                 }
-            } else {
-                console.error('Data is invalid even for Washington DC');
-                setChartData([]);
-            }
+            }, 1000);
         }
     };
 
@@ -548,7 +593,6 @@ export default function Home() {
                         } else {
                             const currentVideo =
                                 videoRefs.current[selectedVariableIndex];
-                            console.log(currentVideo.currentTime, currentVideo);
 
                             if (currentVideo && currentVideo.readyState >= 2) {
                                 const seekTime = newFrame / FPS;
@@ -584,11 +628,52 @@ export default function Home() {
     // the blur is active, and bring them back once the blur is off.
     useEffect(() => {
         const attribution = document.querySelector('.esri-attribution');
-        if ((isBlurActive || showTransition) && attribution) {
-            attribution.style.display = 'none';
-        } else if (attribution) {
-            attribution.style.display = 'flex';
+
+        if (attribution) {
+            attribution.style.display =
+                isBlurActive || showTransition ? 'none' : 'flex';
         }
+
+        const handleDocumentClick = (event) => {
+            const searchExpand = searchExpandRef.current;
+            const blurOverlay = blurOverlayRef.current;
+
+            if (!searchExpand || !blurOverlay) return;
+
+            const isClickInsideSearchExpand = searchExpand.domNode.contains(
+                event.target
+            );
+            const isClickInsideBlurOverlay = blurOverlay.contains(event.target);
+
+            if (
+                isBlurActive &&
+                !isClickInsideSearchExpand &&
+                !isClickInsideBlurOverlay
+            ) {
+                searchExpand.collapse();
+            }
+        };
+
+        const handleBlurOverlayClick = () => {
+            const searchExpand = searchExpandRef.current;
+            if (searchExpand) {
+                searchExpand.collapse();
+            }
+        };
+
+        document.addEventListener('click', handleDocumentClick);
+        blurOverlayRef.current?.addEventListener(
+            'click',
+            handleBlurOverlayClick
+        );
+
+        return () => {
+            document.removeEventListener('click', handleDocumentClick);
+            blurOverlayRef.current?.removeEventListener(
+                'click',
+                handleBlurOverlayClick
+            );
+        };
     }, [isBlurActive, showTransition]);
 
     return (

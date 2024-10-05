@@ -117,3 +117,7 @@
     opacity: 0;
     visibility: hidden;
   }
+
+  .tooltip__content{
+    padding-bottom:0 !important;
+  }

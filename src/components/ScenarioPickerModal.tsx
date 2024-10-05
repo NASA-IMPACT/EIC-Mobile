@@ -93,6 +93,19 @@ export default function ScenarioPickerModal({
                             </div>
                         </div>
                     ))}
+
+                    <div className="w-full border-t border-[#FFFFFF1A] mt-10"></div>
+
+                    <div className="mt-2 text-left">
+                        <a
+                            href="https://earth.gov/stories/si_nmnh"
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            className="text-[14px] leading-[21px] font-normal text-white opacity-50"
+                        >
+                            Learn more at https://earth.gov/stories/si_nmnh
+                        </a>
+                    </div>
                 </div>
             </div>
         </div>

@@ -1,14 +1,14 @@
 export const bufferSymbol = {
     type: 'simple-fill',
-    color: [5, 80, 216, 0.5],
-    outline: { color: [255, 255, 255, 0], width: 0 }
+    color: [5, 80, 216, 0.4],
+    outline: { color: [255, 255, 255, 1], width: 0.5 }
 };
 
 export const crosshairSymbol = {
     type: 'simple-marker',
     style: 'cross',
     color: [5, 80, 216],
-    size: 12,
+    size: 8,
     outline: {
         color: [255, 255, 255],
         width: 1

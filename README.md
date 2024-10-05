@@ -58,6 +58,7 @@ This project follows a Gitflow branching model:
 
 - Main Branch: The main branch is also protected and only accepts pull requests from the development branch.
 
+
 ## Configuration
 
 The ```config.json``` file is a vital metadata file that points the application to the proper video and image service endpoints. For the application to run properly, it’s important to configure the file according to the following parameters.

@@ -1,6 +1,8 @@
-
-export const handleImageServiceRequest = async (event, variable, setChartData) => {
+export const handleImageServiceRequest = async (event, variable, setChartData, setIsLoading, setIsInvalidData) => {
   const point = event.mapPoint;
+
+  setIsLoading(true);
+  setIsInvalidData(false);
 
   const url = new URL(variable.service + "/getSamples");
 
@@ -33,7 +35,7 @@ export const handleImageServiceRequest = async (event, variable, setChartData) =
   try {
     const response = await fetch(url.toString(), { method: 'GET' });
     const results = await response.json();
-    // const results = mockData;
+    // const results = mockData; // Uncomment this line to use mockData during testing
 
     let invalidData = false;
 
@@ -97,14 +99,21 @@ export const handleImageServiceRequest = async (event, variable, setChartData) =
         }));
 
         setChartData(chartData);
+        setIsLoading(false);
+        setIsInvalidData(false);
+        return true;
+      } else {
+        setIsInvalidData(true);
       }
     } else {
       invalidData = true;
+      setIsInvalidData(true);
     }
 
     return !invalidData;
   } catch (err) {
     console.error('Error fetching data from ImageService:', err);
+    setIsLoading(false);
     return false;
   }
 };

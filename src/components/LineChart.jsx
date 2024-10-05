@@ -59,7 +59,7 @@ export default function LineChart({ selectedIndex, isFahrenheit }) {
                                 borderColor:
                                     selectedIndex === 0
                                         ? '#FFFFFFBF'
-                                        : 'rgba(239, 239, 240, 0.2)',
+                                        : 'rgba(239, 239, 240, 0.4)',
                                 borderWidth: selectedIndex === 0 ? 1 : 0.5,
                                 fill: false,
                                 pointRadius: 0
@@ -72,7 +72,7 @@ export default function LineChart({ selectedIndex, isFahrenheit }) {
                                 borderColor:
                                     selectedIndex === 1
                                         ? '#FFFFFFBF'
-                                        : 'rgba(239, 239, 240, 0.2)',
+                                        : 'rgba(239, 239, 240, 0.4)',
                                 borderWidth: selectedIndex === 1 ? 1 : 0.5,
                                 fill: false,
                                 pointRadius: 0
@@ -85,7 +85,7 @@ export default function LineChart({ selectedIndex, isFahrenheit }) {
                                 borderColor:
                                     selectedIndex === 2
                                         ? '#FFFFFFBF'
-                                        : 'rgba(239, 239, 240, 0.2)',
+                                        : 'rgba(239, 239, 240, 0.4)',
                                 borderWidth: selectedIndex === 2 ? 1 : 0.5,
                                 fill: false,
                                 pointRadius: 0
@@ -98,7 +98,7 @@ export default function LineChart({ selectedIndex, isFahrenheit }) {
                                 borderColor:
                                     selectedIndex === 3
                                         ? '#FFFFFFBF'
-                                        : 'rgba(239, 239, 240, 0.2)',
+                                        : 'rgba(239, 239, 240, 0.4)',
                                 borderWidth: selectedIndex === 3 ? 1 : 0.5,
                                 fill: false,
                                 pointRadius: 0

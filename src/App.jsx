@@ -9,6 +9,7 @@ import {
     ErrorContext
 } from './contexts/AppContext';
 import { VideoProvider } from './contexts/VideoContext';
+import { DataFetchingProvider } from './contexts/DataFetchingContext';
 import config from './config.json';
 import RotateOverlay from './components/RotateOverlay';
 import Tour from './components/Tour';
@@ -34,22 +35,24 @@ export default function App() {
                         <ChartDataContext.Provider
                             value={{ chartData, setChartData }}
                         >
-                            {hasWebGLError ? (
-                                <div>
-                                    Your WebGL implementation doesn't seem to
-                                    support hardware accelerated rendering.
-                                    Check your browser settings or if your GPU
-                                    is in a blocklist.
-                                </div>
-                            ) : (
-                                <>
-                                    <Tour />
-                                    <RotateOverlay />
-                                    <EICLogo />
-                                    <Panel />
-                                    <Map />
-                                </>
-                            )}
+                            <DataFetchingProvider>
+                                {hasWebGLError ? (
+                                    <div>
+                                        Your WebGL implementation doesn't seem
+                                        to support hardware accelerated
+                                        rendering. Check your browser settings
+                                        or if your GPU is in a blocklist.
+                                    </div>
+                                ) : (
+                                    <>
+                                        <Tour />
+                                        <RotateOverlay />
+                                        <EICLogo />
+                                        <Panel />
+                                        <Map />
+                                    </>
+                                )}
+                            </DataFetchingProvider>
                         </ChartDataContext.Provider>
                     </VideoProvider>
                 </DataSelectionContext.Provider>

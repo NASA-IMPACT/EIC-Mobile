@@ -5,13 +5,13 @@
             "datasetVariablesTagline": "GHG Emissions Scenario",
             "variables": [
                 {
-                    "name": "126 - Low",
+                    "name": "Low",
                     "description": "Carbon dioxide emissions decline to net zero around 2070, followed by varying levels of reductions in existing carbon dioxide in the atmosphere.",
                     "variable": "tasmax_ssp126",
                     "unit": "Heatmax",
-                    "video": "./tasmax_monthly_ssp126_max12_8192_1024x512.mp4",
-                    "mobileVideo": "./tasmax_monthly_ssp126_max12_8192_512x256.mp4",
-                    "fallbackImage": "./tasmax_monthly_ssp126_first_frame.png",
+                    "video": "./monthly_max_ssp126_max12_8192_1024x512.mp4",
+                    "mobileVideo": "./monthly_max_ssp126_max12_8192_512x256.mp4",
+                    "fallbackImage": "./first_frame_ssp126.png",
                     "service":
                     "https://gis.earthdata.nasa.gov/eic/rest/services/tasmax_yearly_median/ImageServer",
                     "datetimeRange": ["1950-01-31T00:00:00Z", "2100-12-31T23:59:59Z"],
@@ -37,13 +37,13 @@
                     ]
                 },
                 {
-                    "name": "245 - Intermediate",
+                    "name": "Intermediate",
                     "description": "Carbon dioxide emissions remain around current levels until the middle of the 21st century.",
                     "unit": "Heatmax",
                     "variable": "tasmax_ssp245",
-                    "video": "./tasmax_monthly_ssp245_max12_8192_1024x512.mp4",
-                    "mobileVideo": "./tasmax_monthly_ssp245_max12_8192_1024x512.mp4",
-                    "fallbackImage": "./tasmax_monthly_ssp245_first_frame.png",
+                    "video": "./monthly_max_ssp245_max12_8192_512x256.mp4",
+                    "mobileVideo": "./monthly_max_ssp245_max12_8192_1024x512.mp4",
+                    "fallbackImage": "./first_frame_ssp245.png",
                     "service":
                     "https://gis.earthdata.nasa.gov/eic/rest/services/tasmax_yearly_median/ImageServer",
                     "datetimeRange": ["1950-01-31T00:00:00Z", "2100-12-31T23:59:59Z"],
@@ -69,13 +69,13 @@
                     ]
                 },
                 {
-                    "name": "370 - High",
+                    "name": "High",
                     "description": "Carbon dioxide emissions roughly double from current levels by 2100.",
                     "unit": "Heatmax",
                     "variable": "tasmax_ssp370",
-                    "video": "./tasmax_monthly_ssp370_max12_8192_1024x512.mp4",
-                    "mobileVideo": "./tasmax_monthly_ssp370_max12_8192_512x256.mp4",
-                    "fallbackImage": "./tasmax_monthly_ssp370_first_frame.png",
+                    "video": "./monthly_max_ssp370_max12_8192_1024x512.mp4",
+                    "mobileVideo": "./monthly_max_ssp370_max12_8192_512x256.mp4",
+                    "fallbackImage": "./first_frame_ssp370.png",
                     "service":
                     "https://gis.earthdata.nasa.gov/eic/rest/services/tasmax_yearly_median/ImageServer",
                     "datetimeRange": ["1950-01-31T00:00:00Z", "2100-12-31T23:59:59Z"],
@@ -101,12 +101,12 @@
                     ]
                 },
                 {
-                    "name": "585 - Very High",
+                    "name": "Very High",
                     "description": "Carbon dioxide emissions roughly double from current levels by 2050.",
                     "unit": "Heatmax",
-                    "video": "./tasmax_monthly_ssp585_max12_8192_1024x512.mp4",
-                    "mobileVideo": "./tasmax_monthly_ssp585_max12_8192_512x256.mp4",
-                    "fallbackImage": "./tasmax_monthly_ssp585_first_frame.png",
+                    "video": "./monthly_max_ssp585_max12_8192_1024x512.mp4",
+                    "mobileVideo": "./monthly_max_ssp585_max12_8192_512x256.mp4",
+                    "fallbackImage": "./first_frame_ssp585.png",
                     "variable": "tasmax_ssp585",
                     "service":
                     "https://gis.earthdata.nasa.gov/eic/rest/services/tasmax_yearly_median/ImageServer",
