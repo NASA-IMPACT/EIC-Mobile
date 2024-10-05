@@ -35,7 +35,7 @@ export default function Tour() {
                 <p className='text-xs mt-4'>
                 The NEX-GDDP-CMIP6 data is calculated on a 0.25°x0.25° latitude and longitude grid, which is a system of lines used to map the sphere of the Earth.
                 In some cases, the temperature in major cities could be higher than what’s displayed in the gridded cell because it includes a larger area than just that city.
-                For example, if you search for a city, such as Los Angeles, CA the average will include the temperature of Los Angeles (which could be higher than average) plus the surrounding geographical area (which could be lower than average).
+                For example, if you search for a city, such as Los Angeles, CA, the average will include the temperature of Los Angeles (which could be higher than average) plus the surrounding geographical area (which could be lower than average).
 
                 </p>
             </div>,
