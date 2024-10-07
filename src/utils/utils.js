@@ -33,15 +33,7 @@ export const handleImageServiceRequest = async (event, variable, setChartData, s
   };
 
   try {
-    const token = import.meta.env.VITE_GIS_TOKEN ?? '';
-    const referer = import.meta.env.VITE_REFERER ?? 'https://earth.gov';
-    const response = await fetch(url.toString(), {
-      method: 'GET',
-      headers: {
-        'X-Esri-Authorization': `Bearer ${token}`,
-        'Referer': `${referer}`,
-      }
-    });
+    const response = await fetch(url.toString(), { method: 'GET' });
     const results = await response.json();
     // const results = mockData; // Uncomment this line to use mockData during testing
 
