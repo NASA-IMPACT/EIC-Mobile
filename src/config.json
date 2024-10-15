@@ -41,8 +41,8 @@
                     "description": "Carbon dioxide emissions remain around current levels until the middle of the 21st century.",
                     "unit": "Heatmax",
                     "variable": "tasmax_ssp245",
-                    "video": "./monthly_max_ssp245_max12_8192_512x256.mp4",
-                    "mobileVideo": "./monthly_max_ssp245_max12_8192_1024x512.mp4",
+                    "video": "./monthly_max_ssp245_max12_8192_1024x512.mp4",
+                    "mobileVideo": "./monthly_max_ssp245_max12_8192_512x256.mp4",
                     "fallbackImage": "./first_frame_ssp245.png",
                     "service":
                     "https://gis.earthdata.nasa.gov/eic/rest/services/tasmax_yearly_median/ImageServer",
