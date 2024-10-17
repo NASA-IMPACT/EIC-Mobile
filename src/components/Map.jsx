@@ -111,10 +111,10 @@ export default function Home() {
         const middleBufferSymbol = {
             type: 'simple-fill',
             color: [150, 50, 0, 0.0],
-            outline: { color: [255, 255, 255, 1], width: 2,  style:"dash"}
+            outline: { color: [255, 255, 255, 1], width: 2, style: 'dash' }
         };
 
-        const sideLength = 0.25*scaleFactor;
+        const sideLength = 0.25 * scaleFactor;
         const squarePolygon = {
             type: 'polygon',
             rings: [
@@ -133,7 +133,6 @@ export default function Home() {
             geometry: squarePolygon,
             symbol: bufferSymbol
         });
-
 
         const middleCircle = await geometryEngineAsync.geodesicBuffer(
             point,
@@ -381,12 +380,14 @@ export default function Home() {
 
             view.watch('zoom', () => {
                 if (lastKnownPoint) {
-                    debouncedCreateBuffer(
-                        lastKnownPoint,
-                        pointLayer,
-                        bufferLayer,
-                        view
-                    );
+                    setTimeout(() => {
+                        debouncedCreateBuffer(
+                            lastKnownPoint,
+                            pointLayer,
+                            bufferLayer,
+                            view
+                        );
+                    }, 100);
                 }
             });
         }).catch((error) => {
