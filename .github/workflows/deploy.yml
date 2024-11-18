@@ -74,6 +74,7 @@ jobs:
           GOOGLE_TAG_PREVIEW: ${{secrets.GOOGLE_TAG_PREVIEW}}
           VITE_GIS_TOKEN: ${{secrets.GIS_TOKEN}}
           VITE_REFERER: ${{vars.GIS_REFERER}}
+          ADD_DAP_SCRIPT: ${{vars.ADD_DAP_SCRIPT}}
         run: |
           npm install
           npm run build
