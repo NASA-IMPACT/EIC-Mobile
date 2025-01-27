@@ -2,7 +2,6 @@
     "datasets": [
         {
             "datasetName": "Max Temperature",
-            "datasetVariablesTagline": "GHG Emissions Scenario",
             "variables": [
                 {
                     "name": "Low",
@@ -17,12 +16,6 @@
                     "datetimeRange": ["1950-01-31T00:00:00Z", "2100-12-31T23:59:59Z"],
                     "wcs": false,
                     "active": true,
-                    "vitals": {
-                        "globalMin": 0,
-                        "globalMax": 0,
-                        "globalAverage": 0,
-                        "globalTrend": 0
-                    },
                     "tour": [
                         {
                             "stop": 0,
@@ -49,12 +42,6 @@
                     "datetimeRange": ["1950-01-31T00:00:00Z", "2100-12-31T23:59:59Z"],
                     "wcs": false,
                     "active": true,
-                    "vitals": {
-                        "globalMin": 0,
-                        "globalMax": 0,
-                        "globalAverage": 0,
-                        "globalTrend": 0
-                    },
                     "tour": [
                         {
                             "stop": 0,
@@ -81,12 +68,6 @@
                     "datetimeRange": ["1950-01-31T00:00:00Z", "2100-12-31T23:59:59Z"],
                     "wcs": false,
                     "active": true,
-                    "vitals": {
-                        "globalMin": 0,
-                        "globalMax": 0,
-                        "globalAverage": 0,
-                        "globalTrend": 0
-                    },
                     "tour": [
                         {
                             "stop": 0,
@@ -113,12 +94,6 @@
                     "datetimeRange": ["1950-01-31T00:00:00Z", "2100-12-31T23:59:59Z"],
                     "wcs": false,
                     "active": true,
-                    "vitals": {
-                        "globalMin": 0,
-                        "globalMax": 0,
-                        "globalAverage": 0,
-                        "globalTrend": 0
-                    },
                     "tour": [
                         {
                             "stop": 0,
@@ -133,6 +108,112 @@
                     ]
                 }
             ]
+        },
+        {
+            "datasetName": "Precipitation",
+            "variables": [
+                {
+                    "name": "Low",
+                    "description": "Annual precipitation projections under a low greenhouse gas emissions scenario (SSP126).",
+                    "variable": "pr_ssp126",
+                    "unit": "mm/year",
+                    "video": "./monthly_max_ssp126_max12_8192_1024x512.mp4",
+                    "mobileVideo": "./monthly_max_ssp126_max12_8192_512x256.mp4",
+                    "fallbackImage": "./first_frame_ssp126.png",
+                    "service": "https://gis.earthdata.nasa.gov/eic/rest/services/pr_yearly_median/ImageServer",
+                    "datetimeRange": ["1950-01-31T00:00:00Z", "2100-12-31T23:59:59Z"],
+                    "wcs": false,
+                    "active": true,
+                    "tour": [
+                        {
+                            "stop": 0,
+                            "location": {
+                                "latitude": 0,
+                                "longitude": 0,
+                                "zoom": 2,
+                                "delay": 10000
+                            },
+                            "text": "Explore the global distribution of annual precipitation values under a low greenhouse gas emissions scenario."
+                        }
+                    ]
+                },
+                {
+                    "name": "Intermediate",
+                    "description": "Annual precipitation projections under an intermediate greenhouse gas emissions scenario (SSP245).",
+                    "variable": "pr_ssp245",
+                    "unit": "mm/year",
+                    "video": "./monthly_max_ssp245_max12_8192_1024x512.mp4",
+                    "mobileVideo": "./monthly_max_ssp245_max12_8192_512x256.mp4",
+                    "fallbackImage": "./first_frame_ssp245.png",
+                    "service": "https://gis.earthdata.nasa.gov/eic/rest/services/pr_yearly_median/ImageServer",
+                    "datetimeRange": ["1950-01-31T00:00:00Z", "2100-12-31T23:59:59Z"],
+                    "wcs": false,
+                    "active": true,
+                    "tour": [
+                        {
+                            "stop": 0,
+                            "location": {
+                                "latitude": 0,
+                                "longitude": 0,
+                                "zoom": 2,
+                                "delay": 10000
+                            },
+                            "text": "Explore the global distribution of annual precipitation values under an intermediate greenhouse gas emissions scenario."
+                        }
+                    ]
+                },
+                {
+                    "name": "High",
+                    "description": "Annual precipitation projections under a high greenhouse gas emissions scenario (SSP370).",
+                    "variable": "pr_ssp370",
+                    "unit": "mm/year",
+                    "video": "./monthly_max_ssp370_max12_8192_1024x512.mp4",
+                    "mobileVideo": "./monthly_max_ssp370_max12_8192_512x256.mp4",
+                    "fallbackImage": "./first_frame_ssp370.png",
+                    "service": "https://gis.earthdata.nasa.gov/eic/rest/services/pr_yearly_median/ImageServer",
+                    "datetimeRange": ["1950-01-31T00:00:00Z", "2100-12-31T23:59:59Z"],
+                    "wcs": false,
+                    "active": true,
+                    "tour": [
+                        {
+                            "stop": 0,
+                            "location": {
+                                "latitude": 0,
+                                "longitude": 0,
+                                "zoom": 2,
+                                "delay": 10000
+                            },
+                            "text": "Explore the global distribution of annual precipitation values under a high greenhouse gas emissions scenario."
+                        }
+                    ]
+                },
+                {
+                    "name": "Very High",
+                    "description": "Annual precipitation projections under a very high greenhouse gas emissions scenario (SSP585).",
+                    "variable": "pr_ssp585",
+                    "unit": "mm/year",
+                    "video": "./monthly_max_ssp585_max12_8192_1024x512.mp4",
+                    "mobileVideo": "./monthly_max_ssp585_max12_8192_512x256.mp4",
+                    "fallbackImage": "./first_frame_ssp585.png",
+                    "service": "https://gis.earthdata.nasa.gov/eic/rest/services/pr_yearly_median/ImageServer",
+                    "datetimeRange": ["1950-01-31T00:00:00Z", "2100-12-31T23:59:59Z"],
+                    "wcs": false,
+                    "active": true,
+                    "tour": [
+                        {
+                            "stop": 0,
+                            "location": {
+                                "latitude": 0,
+                                "longitude": 0,
+                                "zoom": 2,
+                                "delay": 10000
+                            },
+                            "text": "Explore the global distribution of annual precipitation values under a very high greenhouse gas emissions scenario."
+                        }
+                    ]
+                }
+            ]
         }
+
     ]
 }
