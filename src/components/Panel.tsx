@@ -46,9 +46,6 @@ export default function Panel() {
   };
 
   const changeDataset = (datasetIndex) => {
-    // setSelectedDatasetIndex(datasetIndex);
-    // setSelectedVariableIndex(0);
-
     const selectedDataset = config.datasets[datasetIndex];
     const selectedVariable = selectedDataset.variables[0];
 
@@ -128,9 +125,7 @@ export default function Panel() {
       {isModalOpen && (
         <ScenarioPickerModal
           closeModal={() => setIsModalOpen(false)}
-          changeDataset={changeDataset}
           changeVariable={changeVariable}
-          selectedDatasetIndex={selectedDatasetIndex}
           selectedVariableIndex={selectedVariableIndex}
         />
       )}
