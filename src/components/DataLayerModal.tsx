@@ -3,6 +3,7 @@ import { Menu, MenuButton, MenuItem, MenuItems } from '@headlessui/react';
 import { ChevronDownIcon } from '@heroicons/react/24/outline';
 import { useAppContext } from '../contexts';
 import config from '../config.json';
+import { updateMapLayers } from '../utils/sceneHelpers';
 
 const DATASETS = [
   {
@@ -50,10 +51,12 @@ export default function DataLayerModal({
   isFahrenheit,
   isMm,
   setIsFahrenheit,
-  setIsMm
+  setIsMm,
+  mapView
 }) {
-  const { selectedDataset, setSelectedDataset, setDataSelection } =
-    useAppContext();
+  const { dataSelection, setDataSelection } = useAppContext();
+
+  const [selectedDataset] = dataSelection;
 
   useEffect(() => {
     const handleKeyDown = (event) => {
@@ -68,17 +71,18 @@ export default function DataLayerModal({
   };
 
   const handleDatasetChange = (newDatasetId) => {
-    setSelectedDataset(newDatasetId);
     const newDataset = config.datasets.find(
       (d) => d.datasetName.toLowerCase() === newDatasetId
     );
     if (newDataset) {
       setDataSelection([newDataset, newDataset.variables[0]]);
+      updateMapLayers(mapView, newDataset);
     }
   };
 
   const selectedDatasetObj =
-    DATASETS.find((d) => d.id === selectedDataset) || DATASETS[0];
+    DATASETS.find((d) => d.id === selectedDataset.datasetName.toLowerCase()) ||
+    DATASETS[0];
 
   return (
     <div
@@ -116,7 +120,7 @@ export default function DataLayerModal({
                     <button
                       onClick={() => handleDatasetChange(dataset.id)}
                       className={`w-full text-left px-4 py-2 text-sm ${
-                        dataset.id === selectedDataset
+                        dataset.id === selectedDataset.datasetName.toLowerCase()
                           ? 'bg-blue-900 text-white'
                           : 'bg-transparent text-gray-400 group-hover:bg-gray-700 group-hover:text-white'
                       }`}
@@ -133,7 +137,7 @@ export default function DataLayerModal({
         <div className='w-full max-w-4xl bg-transparent mt-6'>
           <DataContent content={selectedDatasetObj} />
 
-          {selectedDataset === 'max temperature' && (
+          {selectedDataset.datasetName.toLowerCase() === 'max temperature' && (
             <div className='flex justify-start mt-8'>
               <button
                 className={`px-3 py-2 border border-r-0 rounded-l text-sm font-semibold ${
@@ -158,7 +162,7 @@ export default function DataLayerModal({
             </div>
           )}
 
-          {selectedDataset === 'precipitation' && (
+          {selectedDataset.datasetName.toLowerCase() === 'precipitation' && (
             <div className='flex justify-start mt-8'>
               <button
                 className={`px-3 py-2 border border-r-0 rounded-l text-sm font-semibold ${

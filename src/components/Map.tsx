@@ -59,27 +59,20 @@ const createFeatureLayer = (url) =>
   });
 
 export default function Home() {
-  const {
-    setHasWebGLError,
-    mapView,
-    setMapView,
-    setChartData,
-    dataSelection,
-    selectedDataset
-  } = useAppContext();
-
-  const selectedDatasetRef = useRef(selectedDataset);
+  const { setHasWebGLError, mapView, setMapView, setChartData, dataSelection } =
+    useAppContext();
 
   const { videoRefs, currentFrame, setCurrentFrame, isPlaying } =
     useVideoContext();
 
   const { setIsLoading, setIsInvalidData } = useDataContext();
 
-  const [selectedVariable] = dataSelection;
+  const [selectedDataset, selectedVariable] = dataSelection;
 
   const currentDataset = config.datasets.find(
     (dataset) =>
-      dataset.datasetName.toLowerCase() === selectedDataset.toLowerCase()
+      dataset.datasetName.toLowerCase() ===
+      selectedDataset.datasetName.toLowerCase()
   );
 
   const selectedDatasetVariables = currentDataset.variables;
@@ -87,6 +80,8 @@ export default function Home() {
   const selectedVariableIndex = selectedDatasetVariables.findIndex(
     (variable) => variable.name === selectedVariable.name
   );
+
+  const dataSelectionRef = useRef(dataSelection);
 
   const [showTransition, setShowTransition] = useState(true);
   const [isShareMenuOpen, setIsShareMenuOpen] = useState(false);
@@ -97,7 +92,13 @@ export default function Home() {
   const searchExpandRef = useRef(null);
 
   const [allVideosLoaded, setAllVideosLoaded] = useState(false);
-  let totalVideos = 4;
+
+  // Dynamically calculate the total number of videos by summing up
+  // the number of variables across all datasets in the configuration
+  let totalVideos = config.datasets.reduce((sum, dataset) => {
+    return sum + dataset.variables.length;
+  }, 0);
+
   let loadedVideos = 0;
 
   let draggingInsideBuffer = false;
@@ -229,7 +230,7 @@ export default function Home() {
 
     const worldCountriesLayer = createFeatureLayer(WORLD_COUNTRIES_LAYER_URL);
 
-    let videoIndex = 0;
+    let videoCounter = 0;
 
     config.datasets.forEach((dataset) => {
       dataset.variables.forEach((variable, index) => {
@@ -267,37 +268,37 @@ export default function Home() {
 
         const imageMediaLayer = new MediaLayer({
           source: [imageElement],
-          title: `${variable.name}_image`,
-          zIndex: index * 2,
-          opacity: variable.name === 'Intermediate' ? 1 : 0
+          title: `${dataset.datasetName}_${variable.name}_image`,
+          opacity: variable.default === true ? 1 : 0
         });
 
         const videoMediaLayer = new MediaLayer({
           source: [videoElement],
-          title: `${variable.name}_video`,
-          zIndex: index * 2 + 1,
-          opacity: variable.name === 'Intermediate' ? 1 : 0
+          title: `${dataset.datasetName}_${variable.name}_video`,
+          opacity: variable.default === true ? 1 : 0
         });
 
         layerList.push(imageMediaLayer, videoMediaLayer);
 
         console.log(
-          `Initializing video for: ${import.meta.env.BASE_URL}${variable.name}`,
-          variable.video
+          `Initializing video for: ${dataset.datasetName}_${variable.name}`
         );
 
         videoElement
           .when(() => {
-            videoRefs.current[index] = videoElement.content;
+            videoRefs.current[videoCounter] = videoElement.content;
             loadedVideos++;
-            console.log(`Video initialized for: ${variable.name}`, videoUrl);
+            console.log(
+              `Video initialized for: ${dataset.datasetName}_${variable.name}`
+            );
 
             imageElement.opacity = 0;
             videoElement.currentTime = currentFrame;
-            videoIndex++;
+            videoCounter++;
 
             if (loadedVideos === totalVideos) {
               setAllVideosLoaded(true);
+              console.log(videoRefs.current);
             }
           })
           .catch((error) => {
@@ -487,10 +488,12 @@ export default function Home() {
   }, [setMapView, setHasWebGLError, videoRefs]);
 
   const fetchLocationData = async (event, view) => {
-    const dataset = selectedDatasetRef.current;
+    const [selectedDataset, selectedVariable] = dataSelectionRef.current;
 
     const currentDataset = config.datasets.find(
-      (d) => d.datasetName.toLowerCase() === dataset.toLowerCase()
+      (d) =>
+        d.datasetName.toLowerCase() ===
+        selectedDataset.datasetName.toLowerCase()
     );
 
     const currentVariable = currentDataset.variables[0];
@@ -681,9 +684,9 @@ export default function Home() {
   }, [isBlurActive, showTransition]);
 
   useEffect(() => {
-    selectedDatasetRef.current = selectedDataset;
+    dataSelectionRef.current = dataSelection;
     fetchLocationData({ mapPoint: lastKnownPoint }, mapView);
-  }, [selectedDataset]);
+  }, [dataSelection[0]]);
 
   return (
     <div>

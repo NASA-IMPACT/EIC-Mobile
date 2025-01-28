@@ -7,8 +7,6 @@ interface ProviderProps {
 }
 
 export const AppProvider: React.FC<ProviderProps> = ({ children }) => {
-  const [selectedDataset, setSelectedDataset] = useState('max temperature');
-
   const defaultDataset = config.datasets[0];
   const defaultVariable = defaultDataset.variables[1];
 
@@ -37,9 +35,7 @@ export const AppProvider: React.FC<ProviderProps> = ({ children }) => {
         chartData,
         setChartData,
         hasWebGLError,
-        setHasWebGLError,
-        selectedDataset,
-        setSelectedDataset
+        setHasWebGLError
       }}
     >
       <DataContext.Provider

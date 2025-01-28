@@ -15,7 +15,7 @@
                     "https://gis.earthdata.nasa.gov/eic/rest/services/tasmax_yearly_median/ImageServer",
                     "datetimeRange": ["1950-01-31T00:00:00Z", "2100-12-31T23:59:59Z"],
                     "wcs": false,
-                    "active": true,
+                    "default": false,
                     "tour": [
                         {
                             "stop": 0,
@@ -41,7 +41,7 @@
                     "https://gis.earthdata.nasa.gov/eic/rest/services/tasmax_yearly_median/ImageServer",
                     "datetimeRange": ["1950-01-31T00:00:00Z", "2100-12-31T23:59:59Z"],
                     "wcs": false,
-                    "active": true,
+                    "default": true,
                     "tour": [
                         {
                             "stop": 0,
@@ -67,7 +67,7 @@
                     "https://gis.earthdata.nasa.gov/eic/rest/services/tasmax_yearly_median/ImageServer",
                     "datetimeRange": ["1950-01-31T00:00:00Z", "2100-12-31T23:59:59Z"],
                     "wcs": false,
-                    "active": true,
+                    "default": false,
                     "tour": [
                         {
                             "stop": 0,
@@ -93,7 +93,7 @@
                     "https://gis.earthdata.nasa.gov/eic/rest/services/tasmax_yearly_median/ImageServer",
                     "datetimeRange": ["1950-01-31T00:00:00Z", "2100-12-31T23:59:59Z"],
                     "wcs": false,
-                    "active": true,
+                    "default": false,
                     "tour": [
                         {
                             "stop": 0,
@@ -123,7 +123,7 @@
                     "service": "https://gis.earthdata.nasa.gov/eic/rest/services/pr_yearly_median/ImageServer",
                     "datetimeRange": ["1950-01-31T00:00:00Z", "2100-12-31T23:59:59Z"],
                     "wcs": false,
-                    "active": true,
+                    "default": false,
                     "tour": [
                         {
                             "stop": 0,
@@ -148,7 +148,7 @@
                     "service": "https://gis.earthdata.nasa.gov/eic/rest/services/pr_yearly_median/ImageServer",
                     "datetimeRange": ["1950-01-31T00:00:00Z", "2100-12-31T23:59:59Z"],
                     "wcs": false,
-                    "active": true,
+                    "default": false,
                     "tour": [
                         {
                             "stop": 0,
@@ -173,7 +173,7 @@
                     "service": "https://gis.earthdata.nasa.gov/eic/rest/services/pr_yearly_median/ImageServer",
                     "datetimeRange": ["1950-01-31T00:00:00Z", "2100-12-31T23:59:59Z"],
                     "wcs": false,
-                    "active": true,
+                    "default": false,
                     "tour": [
                         {
                             "stop": 0,
@@ -198,7 +198,7 @@
                     "service": "https://gis.earthdata.nasa.gov/eic/rest/services/pr_yearly_median/ImageServer",
                     "datetimeRange": ["1950-01-31T00:00:00Z", "2100-12-31T23:59:59Z"],
                     "wcs": false,
-                    "active": true,
+                    "default": false,
                     "tour": [
                         {
                             "stop": 0,

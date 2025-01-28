@@ -1,12 +1,17 @@
 import React, { useEffect } from 'react';
 import { ArrowRightIcon } from '@heroicons/react/24/solid';
 import config from '../config.json';
+import { useAppContext } from '../contexts';
 
 export default function ScenarioPickerModal({
   closeModal,
   changeVariable,
   selectedVariableIndex
 }) {
+  const { dataSelection } = useAppContext();
+
+  const [selectedDataset] = dataSelection;
+
   useEffect(() => {
     const handleKeyDown = (event) => {
       if (event.key === 'Escape') {
@@ -26,6 +31,23 @@ export default function ScenarioPickerModal({
       closeModal();
     }
   };
+
+  const currentDataset = config.datasets.find(
+    (dataset) =>
+      dataset.datasetName.toLowerCase() ===
+      selectedDataset.datasetName.toLowerCase()
+  );
+
+  if (!currentDataset) {
+    return (
+      <div className='fixed inset-0 z-[999] w-full h-full bg-black bg-opacity-30 backdrop-blur-lg flex justify-center items-center'>
+        <div className='text-white text-center'>
+          <h2>Dataset not found</h2>
+          <button onClick={closeModal}>Close</button>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div
@@ -48,7 +70,7 @@ export default function ScenarioPickerModal({
         </h2>
 
         <div className='w-full max-w-[760px] bg-transparent'>
-          {config.datasets[0].variables.map((variable, variableIndex) => (
+          {currentDataset.variables.map((variable, variableIndex) => (
             <div
               key={variableIndex}
               className={`flex items-start mb-4 px-6 py-4 rounded-lg cursor-pointer transition-colors duration-200 ${

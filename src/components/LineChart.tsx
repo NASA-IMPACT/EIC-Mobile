@@ -9,8 +9,11 @@ import { useAppContext, useVideoContext } from '../contexts';
 import React from 'react';
 
 export default function LineChart({ selectedIndex, isFahrenheit, isMm }) {
-  const { chartData, selectedDataset } = useAppContext();
+  const { chartData, dataSelection } = useAppContext();
   const { currentFrame, videoRefs, setCurrentFrame } = useVideoContext();
+
+  const [selectedDataset] = dataSelection;
+
   const chartRef = useRef(null);
   const chartInstanceRef = useRef(null);
   const yAxisChartRef = useRef(null);
@@ -113,7 +116,8 @@ export default function LineChart({ selectedIndex, isFahrenheit, isMm }) {
                   label: function (tooltipItem) {
                     const value = tooltipItem.raw;
                     const variableType =
-                      selectedDataset === 'precipitation'
+                      selectedDataset.datasetName.toLowerCase() ===
+                      'precipitation'
                         ? 'precipitation'
                         : 'max temperature';
                     const targetUnit =
@@ -248,16 +252,17 @@ export default function LineChart({ selectedIndex, isFahrenheit, isMm }) {
                   maxTicksLimit: 5,
                   callback: (value) => {
                     const targetUnit =
-                      selectedDataset === 'max temperature'
+                      selectedDataset.datasetName.toLowerCase() ===
+                      'max temperature'
                         ? isFahrenheit
                           ? 'F'
                           : 'C'
                         : isMm
-                        ? ''
-                        : '';
+                        ? 'mm'
+                        : 'in';
                     return `${convertValue(
                       value,
-                      selectedDataset,
+                      selectedDataset.datasetName.toLowerCase(),
                       targetUnit
                     )} ${targetUnit}`;
                   }
@@ -278,17 +283,21 @@ export default function LineChart({ selectedIndex, isFahrenheit, isMm }) {
         const yAxis = chart.options.scales.y;
         yAxis.ticks.callback = (value) => {
           const targetUnit =
-            selectedDataset === 'max temperature'
+            selectedDataset.datasetName.toLowerCase() === 'max temperature'
               ? isFahrenheit
                 ? 'F'
                 : 'C'
-              : selectedDataset === 'precipitation'
+              : selectedDataset.datasetName.toLowerCase() === 'precipitation'
               ? isMm
                 ? 'mm'
                 : 'in'
               : 'F';
 
-          return `${convertValue(value, selectedDataset, targetUnit)}`;
+          return `${convertValue(
+            value,
+            selectedDataset.datasetName.toLowerCase(),
+            targetUnit
+          )} ${targetUnit}`;
         };
       };
 

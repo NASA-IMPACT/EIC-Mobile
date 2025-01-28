@@ -43,13 +43,13 @@
 
 .y-axis-canvas {
     overflow: hidden;
-    width: 70px;
+    width: 80px;
     z-index: 9;
     position: fixed;
     bottom: 10px;
     height: 200px !important;
     pointer-events: none;
-    left: 23px;
+    left: 30px;
 
     @media screen and (max-width: 768px) {
         height: 150px !important;

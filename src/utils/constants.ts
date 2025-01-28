@@ -2,7 +2,6 @@ export const FPS = 1;
 export const TOTAL_FRAMES = 150;
 export const TIME_STEP = 500;
 export const FRAME_DURATION = TIME_STEP / FPS;
-export const MANUAL_FORWARD_BACKWARD_STEP_SIZE = 10;
 
 // Baseline Test:
 // 1fps, GOP=1, CRF=18 (already tested)

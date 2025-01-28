@@ -11,6 +11,7 @@ import { ArrowRightIcon } from '@heroicons/react/24/solid';
 import { getTextColor } from '../utils/colors';
 import { useAppContext, useDataContext, useVideoContext } from '../contexts';
 import React from 'react';
+import { updateMapLayers } from '../utils/sceneHelpers';
 
 export default function Panel() {
   const { mapView, setDataSelection, chartData, dataSelection } =
@@ -34,7 +35,9 @@ export default function Panel() {
 
   const handlePlayPause = () => {
     if (isPlaying) {
-      videoRefs.current.forEach((video) => video.pause());
+      videoRefs.current.forEach((video) => {
+        video.pause();
+      });
       setCurrentFrame(
         videoRefs.current[selectedVariableIndex].currentTime * FPS
       );
@@ -45,31 +48,12 @@ export default function Panel() {
     setIsPlaying(!isPlaying);
   };
 
-  const changeDataset = (datasetIndex) => {
-    const selectedDataset = config.datasets[datasetIndex];
-    const selectedVariable = selectedDataset.variables[0];
-
-    setDataSelection([selectedDataset, selectedVariable]);
-  };
-
   const changeVariable = (variableIndex) => {
-    const selectedDataset = config.datasets[selectedDatasetIndex];
     const selectedVariable = selectedDataset.variables[variableIndex];
 
     setDataSelection([selectedDataset, selectedVariable]);
 
-    mapView.map.layers.forEach((layer) => {
-      if (layer.type !== 'media') return;
-
-      const variableName = selectedVariable.name;
-      const validTitles = [`${variableName}_image`, `${variableName}_video`];
-
-      if (validTitles.includes(layer.title)) {
-        layer.opacity = 1;
-      } else {
-        layer.opacity = 0;
-      }
-    });
+    updateMapLayers(mapView, selectedDataset, selectedVariable);
   };
 
   const getMaxValuesForYears = useMemo(() => {
@@ -137,6 +121,7 @@ export default function Panel() {
           isMm={isMm}
           setIsFahrenheit={setIsFahrenheit}
           setIsMm={setIsMm}
+          mapView={mapView}
         />
       )}
       {!isModalOpen && (
