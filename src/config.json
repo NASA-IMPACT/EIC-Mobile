@@ -13,7 +13,7 @@
                     "mobileVideo": "./monthly_max_ssp126_max12_8192_512x256.mp4",
                     "fallbackImage": "./first_frame_ssp126.png",
                     "service":
-                    "https://gis.earthdata.nasa.gov/eic/rest/services/tasmax_yearly_median/ImageServer",
+                    "https://gis.earthdata.nasa.gov/gis05/rest/services/EIC/tasmax_yearly_median/ImageServer",
                     "datetimeRange": ["1950-01-31T00:00:00Z", "2100-12-31T23:59:59Z"],
                     "wcs": false,
                     "active": true,
@@ -45,7 +45,7 @@
                     "mobileVideo": "./monthly_max_ssp245_max12_8192_512x256.mp4",
                     "fallbackImage": "./first_frame_ssp245.png",
                     "service":
-                    "https://gis.earthdata.nasa.gov/eic/rest/services/tasmax_yearly_median/ImageServer",
+                    "https://gis.earthdata.nasa.gov/gis05/rest/services/EIC/tasmax_yearly_median/ImageServer",
                     "datetimeRange": ["1950-01-31T00:00:00Z", "2100-12-31T23:59:59Z"],
                     "wcs": false,
                     "active": true,
@@ -77,7 +77,7 @@
                     "mobileVideo": "./monthly_max_ssp370_max12_8192_512x256.mp4",
                     "fallbackImage": "./first_frame_ssp370.png",
                     "service":
-                    "https://gis.earthdata.nasa.gov/eic/rest/services/tasmax_yearly_median/ImageServer",
+                    "https://gis.earthdata.nasa.gov/gis05/rest/services/EIC/tasmax_yearly_median/ImageServer",
                     "datetimeRange": ["1950-01-31T00:00:00Z", "2100-12-31T23:59:59Z"],
                     "wcs": false,
                     "active": true,
@@ -109,7 +109,7 @@
                     "fallbackImage": "./first_frame_ssp585.png",
                     "variable": "tasmax_ssp585",
                     "service":
-                    "https://gis.earthdata.nasa.gov/eic/rest/services/tasmax_yearly_median/ImageServer",
+                    "https://gis.earthdata.nasa.gov/gis05/rest/services/EIC/tasmax_yearly_median/ImageServer",
                     "datetimeRange": ["1950-01-31T00:00:00Z", "2100-12-31T23:59:59Z"],
                     "wcs": false,
                     "active": true,
