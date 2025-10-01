@@ -5,7 +5,7 @@ const Logo = () => {
   return (
     <a
       href='/'
-      className='fixed z-[9] top-5 left-5 rounded-md p-3 sm:p-4 sm:top-[20px] sm:left-[20px] sm:gap-3 flex items-center'
+      className='fixed z-[9] top-5 mt-5 left-5 rounded-md p-3 sm:p-4 sm:top-[20px] sm:left-[20px] sm:gap-3 flex items-center'
       style={{
         background: '#01112D80',
         borderRadius: '4px',
