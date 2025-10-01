@@ -28,3 +28,7 @@
 
       -ms-overflow-style: none;
 }
+
+.esri-ui-inner-container {
+    margin-top: 40px;
+}
