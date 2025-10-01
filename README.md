@@ -41,6 +41,24 @@ Test in dev mode
 npm run dev
 ```
 
+## Git Workflow
+
+This project follows a Gitflow branching model:
+
+- Feature/Bugfix Branches: Start development from a feature or bugfix branch. Use a meaningful branch name like feature/your-feature or bugfix/your-bugfix.
+
+- Pull Request to Development Branch: When your work is ready, open a pull request (PR) from your feature or bugfix branch to the development branch.
+
+- Staging Deployment: Once the PR is merged into the development branch, the changes will automatically be deployed to the staging environment for further testing.
+
+- Production Deployment: If the changes in staging are approved, open a PR from the development branch to the main branch. Upon merging, the changes will be deployed to the production environment.
+
+## Branch Protection Rules
+- Development Branch: The development branch is protected, and direct commits are not allowed. All changes must come through pull requests.
+
+- Main Branch: The main branch is also protected and only accepts pull requests from the development branch.
+
+
 ## Configuration
 
 The ```config.json``` file is a vital metadata file that points the application to the proper video and image service endpoints. For the application to run properly, it’s important to configure the file according to the following parameters.
@@ -107,3 +125,4 @@ This project is licensed under the MIT License
 ## Acknowledgments
 
 * NASA Scientific Visualization Studio
+e

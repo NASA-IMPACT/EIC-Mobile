@@ -1,21 +1,33 @@
+
 @import 'https://js.arcgis.com/4.30/@arcgis/core/assets/esri/themes/dark/main.css';
 
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
 
+/* Some custom overrides for a few of the elements
+ * in the UI. Long-term these should ideally be handled by
+ * Tailwind CSS like the rest of the components.
+ */
 
-.esri-view {
+ .esri-view {
+    --esri-view-outline: none;
+ }
 
-    @media screen and (max-width: 768px) {
-        height: calc(100vh - 200px)
+.esri-ui-top-left {
+    display: none;
+}
 
+.esri-attribution {
+    position: fixed !important;
+    background: transparent;
+    z-index: 5 !important;
+
+    @media screen and (max-width: 1024px) {
+        bottom: 0 !important;
     }
 }
 
-.esri-sketch {
-    display: none;
-}
 
 * {
     font-family: "Manrope", sans-serif;
@@ -32,3 +44,84 @@
 .esri-ui-inner-container {
     margin-top: 40px;
 }
+
+.y-axis-canvas {
+    overflow: hidden;
+    width: 70px;
+    z-index: 9;
+    position: fixed;
+    bottom: 10px;
+    height: 200px !important;
+    pointer-events: none;
+    left: 23px;
+
+    @media screen and (max-width: 768px) {
+        height: 150px !important;
+        bottom: 30px;
+        left: 10px;
+    }
+
+    @media screen and (max-width: 640px) {
+        bottom: 15px !important;
+    }
+}
+
+.panel-max-values {
+
+    @media screen and (max-width: 768px) {
+        margin-left: 35px !important;
+        margin-right: 35px !important;
+        padding-right: 35px !important;
+    }
+
+    @media  screen and (min-width: 768px) {
+        overflow: visible;
+        width: calc(100% - 30px);
+        margin-left: auto;
+    }
+}
+
+
+.blur-overlay {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    z-index: 10;
+    display: none;
+}
+
+.blur-overlay.active {
+    display: block;
+}
+
+.esri-search {
+    z-index: 20;
+}
+
+.esri-ui {
+    z-index: 99;
+}
+
+
+.chartjs-tooltip {
+    position: fixed;
+    background-color: rgba(0, 0, 0, 0.8);
+    color: #fff;
+    padding: 8px;
+    border-radius: 4px;
+    pointer-events: none;
+    transform: translate(-50%, 0);
+    transition: all 0.1s ease;
+    white-space: nowrap;
+  }
+
+  .chartjs-tooltip-hidden {
+    opacity: 0;
+    visibility: hidden;
+  }
+
+  .tooltip__content{
+    padding-bottom:0 !important;
+  }

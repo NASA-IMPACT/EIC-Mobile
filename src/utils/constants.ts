@@ -1,6 +1,6 @@
 export const FPS = 1;
 export const TOTAL_FRAMES = 150;
-export const TIME_STEP = 1000;
+export const TIME_STEP = 500;
 export const FRAME_DURATION = TIME_STEP / FPS;
 export const MANUAL_FORWARD_BACKWARD_STEP_SIZE = 10;
 

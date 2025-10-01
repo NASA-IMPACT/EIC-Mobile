@@ -14,3 +14,8 @@ export const ChartDataContext = React.createContext({
     chartData: null,
     setChartData: () => {}
 });
+
+export const ErrorContext = React.createContext({
+    hasWebGLError: false,
+    setHasWebGLError: () => {}
+});

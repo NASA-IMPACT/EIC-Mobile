@@ -1,6 +1,8 @@
-
-export const handleImageServiceRequest = async (event, variable, setChartData) => {
+export const handleImageServiceRequest = async (event, variable, setChartData, setIsLoading, setIsInvalidData) => {
   const point = event.mapPoint;
+
+  setIsLoading(true);
+  setIsInvalidData(false);
 
   const url = new URL(variable.service + "/getSamples");
 
@@ -15,63 +17,111 @@ export const handleImageServiceRequest = async (event, variable, setChartData) =
   url.searchParams.append("interpolation", "RSP_NearestNeighbor");
 
   const mockData = {
-    samples: Array.from({ length: 150 }, (_, i) => {
+    samples: Array.from({ length: 151 }, (_, i) => {
       const year = 1950 + i;
       const baseTemp = 70 + i * 0.1;
       return {
         attributes: {
           StdTime: Date.UTC(year, 0, 1),
-          heatmax_ssp126: (baseTemp + Math.random() * 5).toFixed(2),
-          heatmax_ssp245: (baseTemp + Math.random() * 7 + 2).toFixed(2),
-          heatmax_ssp370: (baseTemp + Math.random() * 10 + 5).toFixed(2),
-          heatmax_ssp585: (baseTemp + Math.random() * 15 + 10).toFixed(2),
+          tasmax_ssp126: (baseTemp + Math.random() * 5).toFixed(0),
+          tasmax_ssp245: (baseTemp + Math.random() * 7 + 2).toFixed(0),
+          tasmax_ssp370: (baseTemp + Math.random() * 10 + 5).toFixed(0),
+          tasmax_ssp585: (baseTemp + Math.random() * 15 + 10).toFixed(0),
         },
       };
     }),
   };
 
   try {
-    const response = await fetch(url.toString(), { method: 'GET' });
+    const token = import.meta.env.VITE_GIS_TOKEN ?? '';
+    const referer = import.meta.env.VITE_REFERER ?? 'https://earth.gov';
+    const response = await fetch(url.toString(), {
+      method: 'GET',
+      headers: {
+        'X-Esri-Authorization': `Bearer ${token}`,
+        'Referer': `${referer}`,
+      }
+    });
     const results = await response.json();
-    // const results = mockData;
+    // const results = mockData; // Uncomment this line to use mockData during testing
+
+    let invalidData = false;
 
     if (results.samples && results.samples.length > 0) {
       const yearlyData = {};
 
-      results.samples.forEach(sample => {
+      for (const sample of results.samples) {
         const timestamp = sample.attributes.StdTime;
         const date = new Date(timestamp);
         const year = date.getUTCFullYear();
 
+        const tasmax_ssp126 = parseFloat(sample.attributes.tasmax_ssp126);
+        const tasmax_ssp245 = parseFloat(sample.attributes.tasmax_ssp245);
+        const tasmax_ssp370 = parseFloat(sample.attributes.tasmax_ssp370);
+        const tasmax_ssp585 = parseFloat(sample.attributes.tasmax_ssp585);
+
+        if (
+          isNaN(tasmax_ssp126) ||
+          isNaN(tasmax_ssp245) ||
+          isNaN(tasmax_ssp370) ||
+          isNaN(tasmax_ssp585)
+        ) {
+          invalidData = true;
+          break;
+        }
+
         if (!yearlyData[year]) {
           yearlyData[year] = {
-            heatmax_ssp126: parseFloat(sample.attributes.heatmax_ssp126),
-            heatmax_ssp245: parseFloat(sample.attributes.heatmax_ssp245),
-            heatmax_ssp370: parseFloat(sample.attributes.heatmax_ssp370),
-            heatmax_ssp585: parseFloat(sample.attributes.heatmax_ssp585),
+            tasmax_ssp126,
+            tasmax_ssp245,
+            tasmax_ssp370,
+            tasmax_ssp585,
           };
         } else {
-          yearlyData[year].heatmax_ssp126 = Math.max(yearlyData[year].heatmax_ssp126, parseFloat(sample.attributes.heatmax_ssp126));
-          yearlyData[year].heatmax_ssp245 = Math.max(yearlyData[year].heatmax_ssp245, parseFloat(sample.attributes.heatmax_ssp245));
-          yearlyData[year].heatmax_ssp370 = Math.max(yearlyData[year].heatmax_ssp370, parseFloat(sample.attributes.heatmax_ssp370));
-          yearlyData[year].heatmax_ssp585 = Math.max(yearlyData[year].heatmax_ssp585, parseFloat(sample.attributes.heatmax_ssp585));
+          yearlyData[year].tasmax_ssp126 = Math.max(
+            yearlyData[year].tasmax_ssp126,
+            tasmax_ssp126
+          );
+          yearlyData[year].tasmax_ssp245 = Math.max(
+            yearlyData[year].tasmax_ssp245,
+            tasmax_ssp245
+          );
+          yearlyData[year].tasmax_ssp370 = Math.max(
+            yearlyData[year].tasmax_ssp370,
+            tasmax_ssp370
+          );
+          yearlyData[year].tasmax_ssp585 = Math.max(
+            yearlyData[year].tasmax_ssp585,
+            tasmax_ssp585
+          );
         }
-      });
+      }
 
-      const chartData = Object.keys(yearlyData).map(year => ({
-        x: year.toString(),
-        heatmax_ssp126: yearlyData[year].heatmax_ssp126,
-        heatmax_ssp245: yearlyData[year].heatmax_ssp245,
-        heatmax_ssp370: yearlyData[year].heatmax_ssp370,
-        heatmax_ssp585: yearlyData[year].heatmax_ssp585,
-      }));
+      if (!invalidData) {
+        const chartData = Object.keys(yearlyData).map((year) => ({
+          x: year.toString(),
+          tasmax_ssp126: yearlyData[year].tasmax_ssp126,
+          tasmax_ssp245: yearlyData[year].tasmax_ssp245,
+          tasmax_ssp370: yearlyData[year].tasmax_ssp370,
+          tasmax_ssp585: yearlyData[year].tasmax_ssp585,
+        }));
 
-      setChartData(chartData);
+        setChartData(chartData);
+        setIsLoading(false);
+        setIsInvalidData(false);
+        return true;
+      } else {
+        setIsInvalidData(true);
+      }
     } else {
-      setChartData([]);
+      invalidData = true;
+      setIsInvalidData(true);
     }
 
+    return !invalidData;
   } catch (err) {
     console.error('Error fetching data from ImageService:', err);
+    setIsLoading(false);
+    return false;
   }
 };
