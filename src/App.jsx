@@ -2,7 +2,6 @@ import { useState } from 'react';
 import Map from './components/Map';
 import Panel from './components/Panel';
 import EICLogo from './components/Logo';
-import Banner from './components/Banner';
 import {
     MapViewContext,
     ChartDataContext,
@@ -14,8 +13,6 @@ import { DataFetchingProvider } from './contexts/DataFetchingContext';
 import config from './config.json';
 import RotateOverlay from './components/RotateOverlay';
 import Tour from './components/Tour';
-
-const BANNER_TEXT = "Due to the lapse in federal government funding, the Earth Information Center is not updating this website. We sincerely regret this inconvenience.";
 
 export default function App() {
     const defaultDataset = config.datasets[0];
@@ -51,7 +48,6 @@ export default function App() {
                                         <Tour />
                                         <RotateOverlay />
                                         <EICLogo />
-                                        <Banner text={BANNER_TEXT} />
                                         <Panel />
                                         <Map />
                                     </>
