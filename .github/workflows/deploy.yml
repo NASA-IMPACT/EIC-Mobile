@@ -17,7 +17,7 @@ concurrency:
   cancel-in-progress: true
 
 env:
-  NODE: 20
+  NODE: 22
 
 jobs:
   define-environment:
