@@ -13,12 +13,16 @@ const Logo = () => {
       }}
     >
       <span className='sr-only'>Earth Information Center</span>
-      <img className='h-[40px] w-auto' src={EICLogo} alt='Earth Information Center Logo' />
+      <img
+        className='h-[40px] w-auto'
+        src={EICLogo}
+        alt='Earth Information Center Logo'
+      />
       <span
         style={{
           color: '#FFFFFF',
           fontWeight: '700',
-          fontSize: '16px',
+          fontSize: '16px'
         }}
       >
         Mobile Climate Mapper

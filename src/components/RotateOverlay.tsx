@@ -23,10 +23,12 @@ const RotateOverlay = () => {
   if (!showOverlay) return null;
 
   return (
-    <div className="fixed inset-0 z-[99999] flex items-center justify-center bg-black bg-opacity-60 backdrop-blur-lg">
-      <div className="flex flex-col items-center text-center text-white">
-        <DevicePhoneMobileIcon className="h-20 w-20 mb-4" />
-        <p className="text-lg font-semibold">Please rotate your device to portrait mode</p>
+    <div className='fixed inset-0 z-[99999] flex items-center justify-center bg-black bg-opacity-60 backdrop-blur-lg'>
+      <div className='flex flex-col items-center text-center text-white'>
+        <DevicePhoneMobileIcon className='h-20 w-20 mb-4' />
+        <p className='text-lg font-semibold'>
+          Please rotate your device to portrait mode
+        </p>
       </div>
     </div>
   );
