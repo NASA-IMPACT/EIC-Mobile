@@ -39,20 +39,57 @@ const defaultScenePoint = new Point({
     spatialReference: { wkid: 4326 }
 });
 
-const createFeatureLayer = (url) =>
+// LSIB v11.4, mirrored by Esri's public federal-data catalog. Using the
+// portal item preserves the State Department credit in the attribution control.
+const createInternationalBoundariesLayer = () =>
     new FeatureLayer({
-        url,
-        opacity: 1,
-        outFields: ['*'],
+        id: 'international-boundaries',
+        title: 'International boundaries (State Department LSIB)',
+        portalItem: { id: '4f8c32a52cb94a7aad2bf5d7e7d12814' },
+        layerId: 0,
+        outFields: ['RANK'],
+        minScale: 0,
+        maxScale: 0,
         renderer: {
-            type: 'simple',
-            symbol: {
-                type: 'simple-fill',
-                color: [200, 200, 200, 0.1],
-                outline: { color: [255, 255, 255, 0.5], width: 1 }
-            }
+            type: 'unique-value',
+            field: 'RANK',
+            // LSIB requires the three boundary ranks to remain distinguishable.
+            uniqueValueInfos: [
+                {
+                    value: '1',
+                    label: 'International Boundary',
+                    symbol: {
+                        type: 'simple-line',
+                        // Production outlines shared polygon edges twice at 50%.
+                        // One LSIB line at 75% matches that visible contrast.
+                        color: [255, 255, 255, 0.75],
+                        width: 1,
+                        style: 'solid'
+                    }
+                },
+                {
+                    value: '2',
+                    label: 'Other Line of International Separation',
+                    symbol: {
+                        type: 'simple-line',
+                        color: [255, 255, 255, 0.5],
+                        width: 1,
+                        style: 'dot'
+                    }
+                },
+                {
+                    value: '3',
+                    label: 'Special Line',
+                    symbol: {
+                        type: 'simple-line',
+                        color: [255, 255, 255, 0.3],
+                        width: 1,
+                        style: 'dot'
+                    }
+                }
+            ]
         },
-        interactive: false,
+        labelsVisible: false,
         popupEnabled: false
     });
 
@@ -212,9 +249,7 @@ export default function Home() {
 
         let layerList = [];
 
-        const worldCountriesLayer = createFeatureLayer(
-            'https://services.arcgis.com/P3ePLMYs2RVChkJx/arcgis/rest/services/World_Countries/FeatureServer/0'
-        );
+        const internationalBoundariesLayer = createInternationalBoundariesLayer();
 
         let videoIndex = 0;
 
@@ -300,7 +335,7 @@ export default function Home() {
             });
         });
 
-        layerList.push(worldCountriesLayer);
+        layerList.push(internationalBoundariesLayer);
 
         const map = new Map({
             layers: layerList

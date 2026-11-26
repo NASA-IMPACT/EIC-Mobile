@@ -16,9 +16,6 @@ concurrency:
   group: ${{ github.workflow }}-${{ github.ref }}
   cancel-in-progress: true
 
-env:
-  NODE: 20
-
 jobs:
   define-environment:
     name: Set environment
@@ -46,10 +43,10 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v3
 
-      - name: Use Node.js ${{ env.NODE }}
+      - name: Set up Node.js
         uses: actions/setup-node@v4
         with:
-          node-version: ${{ env.NODE }}
+          node-version-file: .nvmrc
 
       - name: Cache node_modules
         uses: actions/cache@v3
@@ -57,7 +54,7 @@ jobs:
         with:
           path: |
             node_modules
-          key: ${{ runner.os }}-build-${{ env.cache-name }}-${{ hashFiles('**/package.json') }}
+          key: ${{ runner.os }}-build-${{ env.cache-name }}-${{ hashFiles('**/package-lock.json', '.nvmrc') }}
 
       - name: Cache dist
         uses: actions/cache@v3
@@ -93,7 +90,7 @@ jobs:
         with:
           path: |
             node_modules
-          key: ${{ runner.os }}-build-${{ env.cache-name }}-${{ hashFiles('**/package.json') }}
+          key: ${{ runner.os }}-build-${{ env.cache-name }}-${{ hashFiles('**/package-lock.json', '.nvmrc') }}
 
       - name: Restore dist cache
         uses: actions/cache@v3
@@ -102,10 +99,10 @@ jobs:
           path: dist
           key: ${{ runner.os }}-build-${{ env.cache-name }}-${{ github.workflow }}-${{ github.sha }}
 
-      - name: Use Node.js ${{ env.NODE }}
+      - name: Set up Node.js
         uses: actions/setup-node@v4
         with:
-          node-version: ${{ env.NODE }}
+          node-version-file: .nvmrc
 
       - name: Configure AWS Credentials
         uses: aws-actions/configure-aws-credentials@v2
